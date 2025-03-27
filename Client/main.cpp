@@ -1,21 +1,23 @@
 #include "raylib.h"
+#include "string"
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+using namespace std;
 
 int main(int argc, char *argv[]) {
     InitWindow(800, 450, "Bronny's Room");
     SetTargetFPS(60);
 
     // Declare variables to be used with elements
-    bool showMessageBox = false;
-    bool inputFieldEditMode = false;
-    char inputFieldText[128] = "Enter Command";
-    bool filterTypeDropdownEditMode = false;
-    int filterTypeDropdownActive = 0;
-    bool sendButtonPressed = false;
-    bool exitButtonPressed = false;
+    Rectangle roomListPanelScrollView = { 0, 0, 0, 0 };
+    Vector2 roomListPanelScrollOffset = { 0, 0 };
+    Vector2 roomListPanelBoundsOffset = { 0, 0 };
+    Rectangle roomChatPanelScrollView = { 0, 0, 0, 0 };
+    Vector2 roomChatPanelScrollOffset = { 0, 0 };
+    Vector2 roomChatPanelBoundsOffset = { 0, 0 };
+    string roomTitle = "Room Title goes here.";
 
     while (!WindowShouldClose())
     {
@@ -25,33 +27,10 @@ int main(int argc, char *argv[]) {
             ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
 
 
-            if (filterTypeDropdownEditMode) GuiLock();
+            GuiScrollPanel({ 0, 0, 104 - roomListPanelBoundsOffset.x, 728 - roomListPanelBoundsOffset.y }, NULL, { 0, 40, 104, 728 }, &roomListPanelScrollOffset, &roomListPanelScrollView);
+            GuiScrollPanel({ 104, 96, 696 - roomChatPanelBoundsOffset.x, 672 - roomChatPanelBoundsOffset.y }, NULL,  { 104, 96, 992, 672 }, &roomChatPanelScrollOffset, &roomChatPanelScrollView);
+            GuiLabel({ 370, 35, 120, 24 }, roomTitle.c_str());
 
-            GuiLabel({ 350, 80, 160, 24 }, "Disconnected");
-            if (GuiTextBox( { 350, 128, 120, 24 }, inputFieldText, 128, inputFieldEditMode)) inputFieldEditMode = !inputFieldEditMode;
-            sendButtonPressed = GuiButton( { 350, 232, 120, 24 }, "Send");
-            exitButtonPressed = GuiButton( { 350, 288, 120, 24 }, "Exit");
-            if (GuiDropdownBox( { 350, 184, 136, 24 }, "Select Filter Type;AUTHOR;TOPIC", & filterTypeDropdownActive, filterTypeDropdownEditMode)) filterTypeDropdownEditMode = !filterTypeDropdownEditMode;
-
-            GuiUnlock();
-
-
-            // Button with response example
-            if (GuiButton({ 24, 24, 120, 30 }, "#191#Show Message"))
-            {
-                showMessageBox = true;
-            }
-
-            if (showMessageBox)
-            {
-                int result = GuiMessageBox({ 85, 70, 250, 100 },
-                    "#191#Message Box", "Hi! This is a message!", "Nice;Cool");
-
-                if (result >= 0)
-                {
-                    showMessageBox = false;
-                }
-            }
 
         EndDrawing();
     }
