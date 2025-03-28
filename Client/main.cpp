@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
     Vector2 roomChatPanelBoundsOffset = { 0, 0 };
     string roomTitle = "Room Title goes here.";
 
+    //------------------------ Testing Packet and Image stuff
     Image image = LoadImage("C:/Users/jaxdr/OneDrive - Conestoga College/School/BCS/Y2S2 ---/Project 4/Project4-Section1Group2/Client/x64/Debug/test.png");
     int numChannels = image.format == 3; // RGBA: 4 channels, RGB: 3 channels
 
@@ -43,10 +44,9 @@ int main(int argc, char *argv[]) {
     ImageResize(&image, 256, 256);
     Texture2D texture = LoadTextureFromImage(image);
 
-    
-
     UnloadImage(image);
-
+    // ------------------------------- End of Testing Stuff
+    
     while (!WindowShouldClose())
     {
         // Draw
