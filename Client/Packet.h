@@ -19,13 +19,14 @@ class Packet
 	struct Header
 	{
 		unsigned char postTextSize; // Size of the post text
-		unsigned int imageSize; // Size of the image
+		int imageSize; // Size of the image
 		PacketType type; // The type of packet
+		int roomNumber; // The room to send this post to
 	} Head;
 	struct Body
 	{
 		char* postText;
-		Image image;
+		unsigned char* imageData;
 	} Body;
 
 	const int BASEPKTSIZE = sizeof(Header);
@@ -39,9 +40,10 @@ public:
 		memset(&Head, 0, sizeof(Head));
 		Head.postTextSize = 0;
 		Head.imageSize = 0;
+		Head.roomNumber = 0;
 		Head.type = TEXT_POST;
 		Body.postText = nullptr;
-		Body.image = { 0 };
+		Body.imageData = nullptr;
 	}
 
 	Packet(char* src)
@@ -50,20 +52,20 @@ public:
 		
 		if (Head.postTextSize > 0)
 		{
-			Body.postText = new char[Head.postTextSize + 1];
-			memcpy(&Body, src + sizeof(Head), Head.postTextSize);
+			Body.postText = new char[Head.postTextSize];
+			memcpy(Body.postText, src + sizeof(Head), Head.postTextSize);
 		}
 
 		if (Head.imageSize > 0)
 		{
-			unsigned char* imgData = new unsigned char[Head.imageSize];
-			memcpy(imgData, src + sizeof(Head) + Head.postTextSize, Head.imageSize);
-
-			Body.image = LoadImageFromMemory("PNG", imgData, Head.imageSize);
-
-			delete[] imgData;
+			Body.imageData = new unsigned char[Head.imageSize];
+			memcpy(Body.imageData, src + sizeof(Head) + Head.postTextSize, Head.imageSize);
 		}
-
+	}
+	
+	void SetRoomNumber(int number)
+	{
+		Head.roomNumber = number;
 	}
 
 	void SetType(PacketType type)
@@ -76,7 +78,6 @@ public:
 
 		if (Body.postText)
 		{
-			Body.postText = nullptr;
 			delete[] Body.postText;
 		}
 
@@ -85,26 +86,42 @@ public:
 		memcpy(Body.postText, srcData, Size);
 		Body.postText[Size] = '\0';
 
-		Head.postTextSize = Size;
+		Head.postTextSize = Size + 1;
 	}
 
-	void SetBody(char* srcData, int txtSize, Image image, unsigned int imageSize)
+	void SetBody(char* srcData, int txtSize, Image image)
 	{
-		txtSize++;
 
 		if (Body.postText)
 		{
 			delete[] Body.postText;
 		}
 
-		Body.postText = new char[txtSize];
+		Body.postText = new char[txtSize + 1];
 
 		memcpy(Body.postText, srcData, txtSize);
-		Body.postText[txtSize - 1] = '\0';
-		Body.image = image;
+		Body.postText[txtSize] = '\0';
+
+		if (Body.imageData)
+		{
+			delete[] Body.imageData;
+		}
+		int exportedSize = 0;
+		Body.imageData = ExportImageToMemory(image, ".png", &exportedSize);
+
+		if (!Body.imageData)
+		{
+			Head.imageSize = 0;
+			return;
+		}
 
 		Head.postTextSize = txtSize;
-		Head.imageSize = imageSize;
+		Head.imageSize = exportedSize;
+	}
+
+	Image GetImage()
+	{
+		return LoadImageFromMemory(".png", Body.imageData, Head.imageSize);
 	}
 
 	char* SerializeData()
@@ -119,11 +136,16 @@ public:
 		
 		// Creates new buffer
 		TxBuffer = new char[totalSize];
-
 		
 		memcpy(TxBuffer, &Head, sizeof(Head));
-		memcpy(TxBuffer + sizeof(Head), Body.postText, Head.postTextSize);
-		memcpy(TxBuffer + sizeof(Head) + Head.postTextSize, &Body.image, Head.imageSize);
+		if (Body.postText)
+		{
+			memcpy(TxBuffer + sizeof(Head), Body.postText, Head.postTextSize);
+		}
+		if(Body.imageData)
+		{ 
+			memcpy(TxBuffer + sizeof(Head) + Head.postTextSize, Body.imageData, Head.imageSize);
+		}
 
 		return TxBuffer;
 	}
