@@ -14,7 +14,7 @@ private:
     std::string roomTitle;
 
 
-public:
+public: 
     RoomPage(std::string name) : Page(name) {
         roomTitle = "Room Title goes here.";
     }

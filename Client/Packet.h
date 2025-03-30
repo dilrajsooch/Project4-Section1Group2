@@ -25,18 +25,21 @@ class Packet
 	} Head;
 	struct Body
 	{
-		char* postText;
-		unsigned char* imageData;
+		char* postText; // The text of the post
+		unsigned char* imageData; // The data of the image
 	} Body;
 
 	const int BASEPKTSIZE = sizeof(Header);
 
-	char* TxBuffer;
+	char* TxBuffer; // The send buffer
 
 public:
-	
+	/// <summary>
+	/// Default Constructor
+	/// </summary>
 	Packet() : TxBuffer(nullptr)
 	{
+		// Safe Empty State
 		memset(&Head, 0, sizeof(Head));
 		Head.postTextSize = 0;
 		Head.imageSize = 0;
@@ -46,6 +49,10 @@ public:
 		Body.imageData = nullptr;
 	}
 
+	/// <summary>
+	/// Create a packet based on a deserialized packet
+	/// </summary>
+	/// <param name="src">The byte array of the incomming packet</param>
 	Packet(char* src)
 	{
 		memcpy(&Head, src, sizeof(Head));
@@ -63,16 +70,29 @@ public:
 		}
 	}
 	
+	/// <summary>
+	/// Sets the destination room number
+	/// </summary>
+	/// <param name="number">The number of the room</param>
 	void SetRoomNumber(int number)
 	{
 		Head.roomNumber = number;
 	}
 
+	/// <summary>
+	/// Sets the type of the packet
+	/// </summary>
+	/// <param name="type">The PacketType</param>
 	void SetType(PacketType type)
 	{
 		Head.type = type;
 	}
 
+	/// <summary>
+	/// Sets the text of the body
+	/// </summary>
+	/// <param name="srcData">The text to be sent</param>
+	/// <param name="Size">The size of the text</param>
 	void SetBody(char* srcData, int Size)
 	{
 
@@ -89,6 +109,12 @@ public:
 		Head.postTextSize = Size + 1;
 	}
 
+	/// <summary>
+	/// Sets the text and image of the body
+	/// </summary>
+	/// <param name="srcData">The text to be sent</param>
+	/// <param name="txtSize">The size of the text</param>
+	/// <param name="image">The image to be sent</param>
 	void SetBody(char* srcData, int txtSize, Image image)
 	{
 
@@ -119,11 +145,19 @@ public:
 		Head.imageSize = exportedSize;
 	}
 
+	/// <summary>
+	/// Gets the image from the packet
+	/// </summary>
+	/// <returns>Image</returns>
 	Image GetImage()
 	{
 		return LoadImageFromMemory(".png", Body.imageData, Head.imageSize);
 	}
 
+	/// <summary>
+	/// Serializes the packet to be sent over the net
+	/// </summary>
+	/// <returns>Byte array</returns>
 	char* SerializeData()
 	{
 		// Clear buffer
@@ -149,13 +183,20 @@ public:
 
 		return TxBuffer;
 	}
-
+	/// <summary>
+	/// Gets the text of the body
+	/// </summary>
+	/// <returns>Character array</returns>
 	char* GetText()
 	{
 		return Body.postText;
 	}
 
 private:
+	/// <summary>
+	/// Gets the total size of the packet
+	/// </summary>
+	/// <returns>The total size of the packet</returns>
 	int GetSize()
 	{
 		return BASEPKTSIZE + Head.imageSize + Head.postTextSize;
