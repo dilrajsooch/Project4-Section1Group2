@@ -192,7 +192,6 @@ public:
 		return Body.postText;
 	}
 
-private:
 	/// <summary>
 	/// Gets the total size of the packet
 	/// </summary>

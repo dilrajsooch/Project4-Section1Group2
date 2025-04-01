@@ -123,6 +123,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CSocket.h" />
     <ClInclude Include="LoginPage.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="Page.h" />
