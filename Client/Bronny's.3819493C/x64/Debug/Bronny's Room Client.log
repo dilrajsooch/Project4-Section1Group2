@@ -27,5 +27,3 @@ C:\vcpkg\installed\x64-windows\include\raygui.h(4246,21): warning C4996: 'fopen'
   (compiling source file 'main.cpp')
   
   Bronny's Room Client.vcxproj -> C:\Users\jaxdr\OneDrive - Conestoga College\School\BCS\Y2S2 ---\Project 4\Project4-Section1Group2\Client\x64\Debug\Bronny's Room Client.exe
-  'pwsh.exe' is not recognized as an internal or external command,
-  operable program or batch file.

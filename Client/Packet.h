@@ -16,6 +16,10 @@ enum PacketType
 
 class Packet
 {
+	char* TxBuffer; // The send buffer
+
+public:
+
 	struct Header
 	{
 		unsigned char postTextSize; // Size of the post text
@@ -31,9 +35,6 @@ class Packet
 
 	const int BASEPKTSIZE = sizeof(Header);
 
-	char* TxBuffer; // The send buffer
-
-public:
 	/// <summary>
 	/// Default Constructor
 	/// </summary>
