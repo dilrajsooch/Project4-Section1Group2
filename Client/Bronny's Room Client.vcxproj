@@ -126,6 +126,7 @@
     <ClInclude Include="CSocket.h" />
     <ClInclude Include="LoginPage.h" />
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="PacketHandler.h" />
     <ClInclude Include="Page.h" />
     <ClInclude Include="PageSystem.h" />
     <ClInclude Include="RoomPage.h" />
