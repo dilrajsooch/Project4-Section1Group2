@@ -129,6 +129,7 @@
     <ClInclude Include="PacketHandler.h" />
     <ClInclude Include="Page.h" />
     <ClInclude Include="PageSystem.h" />
+    <ClInclude Include="Post.h" />
     <ClInclude Include="RoomPage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
