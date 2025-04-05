@@ -44,5 +44,8 @@
     <ClInclude Include="Post.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ChatRoom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
