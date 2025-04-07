@@ -1,17 +1,5 @@
 // ClientHandler.cpp
-
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <iostream>
-#include <thread>
-#include <vector>
 #include "ClientHandler.h"
-#include "Packet.h"
-#include "Logging.h"
-#include "CredentialManager.h"
-#include "ServerState.h"
-
-#pragma comment(lib, "ws2_32.lib")
 
 // Example session state for each client
 enum class ClientSessionState {

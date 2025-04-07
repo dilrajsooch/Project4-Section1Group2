@@ -2,6 +2,7 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
+#include "raylib.h"
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 

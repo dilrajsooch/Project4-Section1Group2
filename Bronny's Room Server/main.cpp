@@ -1,21 +1,34 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS // for gethostbyname, etc.
+
+#ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+    #define NOMINMAX
+#endif
+
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
 #include <thread>
 #include <vector>
 #include <atomic>
-#include "ServerState.h"
-// #include "Packet.h" // your packet code
-// #include "Logging.h" // your logging mechanism
 
 #pragma comment(lib, "ws2_32.lib")
+
+#include "include/ServerState.h"
+#include "include/GlobalDataModel.h"
 
 // Global or static variables
 static std::atomic_bool g_isRunning(true);
 
 // Forward declare
 void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr);
+
+
+//Global GUI Data Model
+GlobalDataModel g_DataModel;
+
 
 int main()
 {
