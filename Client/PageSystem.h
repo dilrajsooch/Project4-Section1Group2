@@ -9,8 +9,9 @@ class PageSystem {
 private:
     std::vector<Page*> pages; // All of the pages
     int currentPageIndex; // Current page indext
+    
+    
 
-public:
     /// <summary>
     /// Defualt Constructor
     /// </summary>
@@ -22,6 +23,25 @@ public:
         for (auto page : pages) {
             delete page;
         }
+    }
+
+
+    static PageSystem* _instance;
+    
+
+public:
+    
+    PageSystem(PageSystem& other) = delete;
+
+    void operator=(const PageSystem&) = delete;
+
+    static PageSystem* GetInstance()
+    {
+        if (_instance == nullptr)
+        {
+            _instance = new PageSystem();
+        }
+        return _instance;
     }
     
     /// <summary>

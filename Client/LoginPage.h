@@ -62,6 +62,8 @@ public:
                 std::string passwordStr(password);
                 // TODO: Implement login logic
                 std::cout << "Login attempted with: " << usernameStr << std::endl;
+
+                PageSystem::GetInstance()->SwitchToPage("Main Room");
             }
 
             if (GuiTextBox(usernameBox, username, 128, loginUsernameEditMode))

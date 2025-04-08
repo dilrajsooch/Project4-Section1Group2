@@ -16,28 +16,28 @@ int main() {
     SetTargetFPS(60);
 
     // Create page system
-    PageSystem pageSystem;
+    PageSystem* pageSystem = PageSystem::GetInstance();
     
     // Create pages
     LoginPage* loginPage = new LoginPage("Login");
     RoomPage* roomPage = new RoomPage("Main Room");
     
     // Add pages to the system
-    pageSystem.AddPage(loginPage);
-    pageSystem.AddPage(roomPage);
+    pageSystem->AddPage(loginPage);
+    pageSystem->AddPage(roomPage);
     
     // Start with the login page
-    pageSystem.SwitchToPage("Login");
+    pageSystem->SwitchToPage("Login");
     
     while (!WindowShouldClose())
     {
         // Update
-        pageSystem.Update();
+        pageSystem->Update();
         
         // Draw
         BeginDrawing();
             ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
-            pageSystem.Draw();
+            pageSystem->Draw();
         EndDrawing();
     }
 
