@@ -1,5 +1,4 @@
 #pragma once
-
 #include <mutex>        
 #include <string>       
 #include <vector>       
@@ -23,42 +22,21 @@ public:
     // ---------------------------
     // User Count Functions
     // ---------------------------
-    void UserConnected() {
-        std::lock_guard<std::mutex> lock(p_connectedMutex);
-        p_totalConnected++;
-    }
-    void UserDisconnected() {
-        std::lock_guard<std::mutex> lock(p_connectedMutex);
-        p_totalConnected--;
-    }
-    int GetUserCount() {
-        std::lock_guard<std::mutex> lock(p_connectedMutex);
-        return p_totalConnected;
-    }
+    void UserConnected();
+    void UserDisconnected();
+    int GetUserCount();
 
     // ---------------------------
     // Log Functions
     // ---------------------------
-    void AddLog(const std::string& msg) {
-        std::lock_guard<std::mutex> lock(p_logMutex);
-        p_logs.push_back(msg);
-    }
-    std::vector<std::string> GetLogs() {
-        std::lock_guard<std::mutex> lock(p_logMutex);
-        return p_logs;
-    }
+    void AddLog(const std::string& msg);
+    std::vector<std::string> GetLogs();
 
     // ---------------------------
     // State Functions
     // ---------------------------
-    void SetState(ServerState state) {
-        std::lock_guard<std::mutex> lock(p_stateMutex);
-        p_state = state;
-    }
-    ServerState GetState() {
-        std::lock_guard<std::mutex> lock(p_stateMutex);
-        return p_state;
-    }
+    void SetState(ServerState state);
+    ServerState GetState();
 
 private:
     // Private constructor for Singleton

@@ -3,21 +3,23 @@
 #include <iostream>
 #include <fstream>
 
-enum PacketType
-{
-	GET_ROOMS,
-	ADD_ROOM,
-	ADD_POST,
-	DELETE_POST,
-	GET_POST,
-	AUTH_REQUEST
-};
-
 class Packet
 {
+private:
 	char* TxBuffer; // The send buffer
 
 public:
+
+	enum PacketType
+	{
+		GET_ROOMS,
+		ADD_ROOM,
+		ADD_POST,
+		DELETE_POST,
+		GET_POST,
+		AUTH_REQUEST,
+		AUTH_RESPONSE
+	};
 
 	struct Header
 	{
@@ -26,6 +28,7 @@ public:
 		PacketType type; // The type of packet
 		int roomNumber; // The room to send this post to
 	} Head;
+
 	struct Body
 	{
 		char* postText; // The text of the post
@@ -53,7 +56,7 @@ public:
 	/// Create a packet based on a deserialized packet
 	/// </summary>
 	/// <param name="src">The byte array of the incomming packet</param>
-	Packet(char* src)
+	Packet(char* src) : TxBuffer(nullptr)
 	{
 		memcpy(&Head, src, sizeof(Head));
 		
@@ -93,7 +96,7 @@ public:
 	/// </summary>
 	/// <param name="srcData">The text to be sent</param>
 	/// <param name="Size">The size of the text</param>
-	void SetBody(char* srcData, int Size)
+	void SetBody(const char* srcData, int Size)
 	{
 
 		if (Body.postText)
@@ -187,9 +190,13 @@ public:
 	/// Gets the text of the body
 	/// </summary>
 	/// <returns>Character array</returns>
-	char* GetText()
+	const char* GetText()
 	{
 		return Body.postText;
+	}
+
+	PacketType GetType() {
+		return Head.type;
 	}
 
 	/// <summary>

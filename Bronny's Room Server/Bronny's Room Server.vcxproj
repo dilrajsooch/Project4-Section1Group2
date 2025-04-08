@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClCompile Include="ClientHandler.cpp" />
     <ClCompile Include="CredentialManager.cpp" />
+    <ClCompile Include="GlobalDataModel.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ServerState.cpp" />
@@ -142,8 +143,9 @@
   <ItemGroup>
     <ClInclude Include="..\Client\Packet.h" />
     <ClInclude Include="ClientHandler.h" />
-    <ClInclude Include="CredentialManager.h" />
-    <ClInclude Include="Logging.h" />
+    <ClInclude Include="include\CredentialManager.h" />
+    <ClInclude Include="include\GlobalDataModel.h" />
+    <ClInclude Include="include\Logging.h" />
     <ClInclude Include="raygui.h" />
     <ClInclude Include="ServerState.h" />
   </ItemGroup>
