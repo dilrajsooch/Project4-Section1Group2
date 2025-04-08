@@ -5,15 +5,22 @@
 #include "PageSystem.h"
 #include "RoomPage.h"
 #include "LoginPage.h"
+#include "CSocket.h"
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
 using namespace std;
 
+
+
 int main() {
     InitWindow(800, 450, "Bronny's Room");
     SetTargetFPS(60);
+    
+
+    // Create Socket
+    CSocket* cSocket = CSocket::GetInstance();
 
     // Create page system
     PageSystem* pageSystem = PageSystem::GetInstance();
