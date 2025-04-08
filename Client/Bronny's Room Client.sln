@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientTests", "..\ClientTes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bronny's Room Server", "..\Bronny's Room Server\Bronny's Room Server.vcxproj", "{DAE63EED-9F46-4456-9A46-9E2713B723AB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bronny's Room Server", "..\Bronny's Room Server\Bronny's Room Server.vcxproj", "{DAE63EED-9F46-4456-9A46-9E2713B723AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

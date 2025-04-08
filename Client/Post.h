@@ -9,6 +9,8 @@ using namespace std;
 class Post
 {
 private:
+	int id;
+	int pid;
 	int roomNumber;
 	string text;
 	Image image;

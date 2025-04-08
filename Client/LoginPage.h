@@ -2,15 +2,25 @@
 #include "PageSystem.h"
 #include "Page.h"
 #include <string>
+#include "CSocket.h"
 
 class LoginPage : public Page {
 private:
+
+    // Connection Details
+    const string IP = "127.0.0.1";
+    const int PORT = 25565;
+
+    // Error Text
+    string error = "";
+
     // Login fields
     Rectangle loginPanel;
     Rectangle usernameBox;
     Rectangle passwordBox;
     Rectangle loginButton;
     Rectangle registerButton;
+    Vector2 errorTextLabel;
     
     // Register fields
     Rectangle registerPanel;
@@ -19,6 +29,7 @@ private:
     Rectangle regConfirmPasswordBox;
     Rectangle submitRegisterButton;
     Rectangle backToLoginButton;
+    Vector2 regErrorTextLabel;
     
     // Input buffers
     char username[128] = "";
@@ -37,12 +48,27 @@ private:
 
 public:
     LoginPage(std::string name) : Page(name) {
+
+        // Connect to server
+        int err = CSocket::GetInstance()->Connect(IP, PORT);
+
+        switch (err)
+        {
+            case -1:
+                error = "Failed to connect to server!";
+                break;
+            case -2:
+                error = "Ip is incorrect!";
+                break;
+        }
+
         // Initialize login panel
         loginPanel = { 200, 100, 400, 250 };
         usernameBox = { 250, 150, 300, 30 };
         passwordBox = { 250, 200, 300, 30 };
         loginButton = { 250, 250, 140, 30 };
         registerButton = { 410, 250, 140, 30 };
+        errorTextLabel = { 210, 320 };
         
         // Initialize register panel
         registerPanel = { 200, 100, 400, 300 };
@@ -51,6 +77,7 @@ public:
         regConfirmPasswordBox = { 250, 250, 300, 30 };
         submitRegisterButton = { 250, 310, 140, 30 };
         backToLoginButton = { 410, 310, 140, 30 };
+        regErrorTextLabel = { 210, 370};
     }
 
     void Update() override {
@@ -135,6 +162,11 @@ public:
             // Draw buttons
             GuiButton(loginButton, "Login");
             GuiButton(registerButton, "Register");
+
+            if (error != "")
+            {
+                DrawText(error.c_str(), errorTextLabel.x, errorTextLabel.y, 15, RED);
+            }
         } else {
             // Draw register panel
             GuiPanel(registerPanel, "Register");
@@ -152,6 +184,10 @@ public:
             // Draw buttons
             GuiButton(submitRegisterButton, "Submit");
             GuiButton(backToLoginButton, "Back to Login");
+            if (error != "")
+            {
+                DrawText(error.c_str(), regErrorTextLabel.x, regErrorTextLabel.y, 15, RED);
+            }
         }
     }
 }; 
