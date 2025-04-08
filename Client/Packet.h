@@ -2,15 +2,15 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
-#include <raygui.h>
+#include "raygui.h"
 
-
-
-enum PacketType 
+enum PacketType
 {
-	TEXT_POST,
-	IMAGE_POST,
-	COMMAND,
+	GET_ROOMS,
+	ADD_ROOM,
+	ADD_POST,
+	DELETE_POST,
+	GET_POST,
 	AUTH_REQUEST
 };
 
@@ -45,7 +45,7 @@ public:
 		Head.postTextSize = 0;
 		Head.imageSize = 0;
 		Head.roomNumber = 0;
-		Head.type = TEXT_POST;
+		Head.type = ADD_POST;
 		Body.postText = nullptr;
 		Body.imageData = nullptr;
 	}
