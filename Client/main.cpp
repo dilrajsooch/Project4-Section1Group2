@@ -12,8 +12,6 @@
 
 using namespace std;
 
-
-
 int main() {
     InitWindow(800, 450, "Bronny's Room");
     SetTargetFPS(60);
