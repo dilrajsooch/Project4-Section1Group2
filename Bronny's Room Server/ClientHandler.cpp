@@ -1,6 +1,4 @@
-// ClientHandler.cpp
-#include "ClientHandler.h"
-#include "include/GlobalDataModel.h"
+#include "include/ClientHandler.h"
 
 // Example session state for each client
 enum class ClientSessionState {
@@ -8,64 +6,6 @@ enum class ClientSessionState {
     AUTHENTICATED
 };
 
-void SendLargeImage(SOCKET clientSocket, const std::string& clientIP, const std::string& filename)
-{
-    // 1) Open the file in binary mode
-    std::ifstream file(filename, std::ios::binary | std::ios::ate);
-    if (!file.is_open())
-    {
-        std::cout << "Could not open image file: " << filename << "\n";
-        return;
-    }
-
-    // 2) Get file size
-    std::streamsize fileSize = file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    // 3) Read file data into buffer
-    std::vector<char> fileData(fileSize);
-    if (!file.read(fileData.data(), fileSize))
-    {
-        std::cout << "Error reading file data.\n";
-        return;
-    }
-
-    // 4) Build a Packet
-    Packet pkt;
-    pkt.SetType(IMAGE_POST);
-
-    // If your Packet supports something like:
-    // pkt.SetBody(char* text, int textSize, Image image, unsigned int imageSize);
-    // But here we only have raw bytes. Possibly you need a specialized overload that sets
-    // the raw data as an "image". For demonstration, we just call a function that
-    // stores the bytes:
-    pkt.SetBody((char*)"", 0, fileData.data(), (unsigned int)fileSize);
-
-    // 5) Serialize
-    char* serialized = pkt.SerializeData();
-    int totalSize = pkt.GetSize();
-
-    // 6) Send in a loop until all bytes are sent
-    int bytesSent = 0;
-    while (bytesSent < totalSize)
-    {
-        int chunk = send(clientSocket, serialized + bytesSent, totalSize - bytesSent, 0);
-        if (chunk == SOCKET_ERROR)
-        {
-            std::cout << "Send error: " << WSAGetLastError() << "\n";
-            break;
-        }
-        bytesSent += chunk;
-    }
-
-    // Log it
-    LogPacket("TX", clientIP, pkt);
-
-    std::cout << "Finished sending image to " << clientIP << ". (" << bytesSent << " bytes)\n";
-
-    // If needed, free resources, e.g. if Packet doesn’t manage that memory for you:
-    // delete[] serialized;
-}
 
 void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
 {
@@ -87,7 +27,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
     {
         // (1) Receive the Header
         // We assume your Packet class has a 'struct Header' you can read
-        char headerBuf[sizeof(Header)];
+        char headerBuf[sizeof(Packet::Header)];
         int bytesReceived = recv(clientSocket, headerBuf, sizeof(headerBuf), 0);
 
         if (bytesReceived <= 0)
@@ -97,8 +37,8 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
         }
 
         // (2) Parse the header to know how many more bytes to read
-        Header head;
-        memcpy(&head, headerBuf, sizeof(Header));
+        Packet::Header head;
+        memcpy(&head, headerBuf, sizeof(Packet::Header));
 
         // (3) Receive the body, if any
         int bodySize = head.postTextSize + head.imageSize; // from your Packet struct
@@ -121,16 +61,16 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
         }
 
         // Combine header + body
-        std::vector<char> fullPacket(sizeof(Header) + bodySize);
-        memcpy(fullPacket.data(), &head, sizeof(Header));
+        std::vector<char> fullPacket(sizeof(Packet::Header) + bodySize);
+        memcpy(fullPacket.data(), &head, sizeof(Packet::Header));
         if (bodySize > 0)
-            memcpy(fullPacket.data() + sizeof(Header), bodyBuf.data(), bodySize);
+            memcpy(fullPacket.data() + sizeof(Packet::Header), bodyBuf.data(), bodySize);
 
         // (4) Construct the Packet
         Packet pkt(fullPacket.data());
 
         // (5) Log the incoming packet
-        LogPacket("RX", clientIP, pkt);
+        Logger::getInstance().LogPacket(INCOMING_PACKET, clientIP, pkt);
 
         // (6) Process the Packet
         switch (head.type)
@@ -139,23 +79,38 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
         {
             if (sessionState == ClientSessionState::AUTH_PENDING)
             {
-                std::string creds = pkt.GetText(); // e.g. "User:Pass"
+                std::string creds = pkt.GetText();
                 // Parse user/pass out of this
-                auto pos = creds.find(":");
+                auto pos = creds.find("|");
                 std::string user = creds.substr(0, pos);
                 std::string pass = creds.substr(pos + 1);
+                
+                bool result = ValidateCredentials(user, pass);
+                std::string userId;
 
-                if (ValidateCredentials(user, pass))
+
+                if (result == true)
                 {
                     sessionState = ClientSessionState::AUTHENTICATED;
                     std::cout << "Client " << clientIP << " authenticated successfully\n";
-                    // Possibly send a response packet to confirm
+                    userId = GetAccountID(user);
                 }
                 else
                 {
                     std::cout << "Client " << clientIP << " failed authentication\n";
-                    // Possibly send error packet, or close connection
+                    userId = "-1";
                 }
+
+                // Create return packet
+                Packet packet;
+                packet.SetType(Packet::AUTH_RESPONSE);
+                packet.SetBody(userId.c_str(), (int)userId.size());
+
+                // Log return packet
+                Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
+
+                //Send return packet
+                send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
             }
             else
             {
@@ -163,66 +118,55 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             }
         } break;
 
-        case COMMAND:
+        case GET_ROOMS:
         {
             if (sessionState != ClientSessionState::AUTHENTICATED)
             {
                 std::cout << "Ignoring command from unauthenticated client\n";
-                // Optionally respond with error
                 continue;
             }
 
-            // For example, check if command is "SHUTDOWN" or "REQUEST_IMAGE"
-            std::string cmd = pkt.GetText();
-            if (cmd == "SHUTDOWN")
+        } break;
+
+        case ADD_ROOM:
+        {
+            if (sessionState != ClientSessionState::AUTHENTICATED)
             {
-                // Possibly set global state to DEINITIALIZING
-                SetServerState(ServerState::DEINITIALIZING);
-                keepRunning = false;
-            }
-            else if (cmd.find("REQUEST_IMAGE") == 0)
-            {
-                // e.g. "REQUEST_IMAGE test.png"
-                // We'll do the large data send (see next section)
-                std::string filename = cmd.substr(cmd.find(" ") + 1);
-                SendLargeImage(clientSocket, clientIP, filename);
+                std::cout << "Ignoring command from unauthenticated client\n";
+                continue;
             }
         } break;
 
-        case TEXT_POST:
+        case ADD_POST:
         {
-            // Chat message or blog post
-            if (sessionState == ClientSessionState::AUTHENTICATED)
+            if (sessionState != ClientSessionState::AUTHENTICATED)
             {
-                std::string message = pkt.GetText();
-                std::cout << "Client posted text: " << message << "\n";
-                // Possibly store or broadcast
+                std::cout << "Ignoring command from unauthenticated client\n";
+                continue;
             }
         } break;
 
-        case IMAGE_POST:
+        case DELETE_POST:
         {
-            // Client is sending an image to server
-            if (sessionState == ClientSessionState::AUTHENTICATED)
+            if (sessionState != ClientSessionState::AUTHENTICATED)
             {
-                // We already have the data in pkt
-                // Possibly store it or forward to other clients
+                std::cout << "Ignoring command from unauthenticated client\n";
+                continue;
             }
         } break;
 
-        case LARGE_IMAGE_POST:
+        case GET_POST:
         {
-            if (sessionState == ClientSessionState::AUTHENTICATED)
+            if (sessionState != ClientSessionState::AUTHENTICATED)
             {
-                SendLargeImage(clientSocket, clientIP, pkt.GetText());
+                std::cout << "Ignoring command from unauthenticated client\n";
+                continue;
             }
-            break;
-        }
+        } break;
 
         default:
             std::cout << "Unknown packet type from client.\n";
-            break;
-        }
+        } break;
 
         // (7) Check global server state
         if (GetServerState() == ServerState::DEINITIALIZING)
@@ -236,4 +180,5 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
 
     closesocket(clientSocket);
     std::cout << "Client thread exiting for " << clientIP << ":" << clientPort << "\n";
+    GlobalDataModel::getInstance().UserDisconnected();
 }

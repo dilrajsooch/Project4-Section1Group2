@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #define WIN32_LEAN_AND_MEAN   // Exclude rarely-used Windows headers
 #define NOGDI             // All GDI defines and routines
 #define NOUSER            // All USER defines and routines

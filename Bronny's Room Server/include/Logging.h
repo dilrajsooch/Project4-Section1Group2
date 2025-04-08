@@ -1,6 +1,30 @@
 #pragma once
 #include <string>
-#include "Packet.h"
+#include <mutex>
+#include "include/Packet.h"
 
-void LogPacket(const std::string& direction, const std::string& clientIP, const Packet& pkt);
-void LogMessage(const std::string& msg);
+#define INCOMING_PACKET    "RX"
+#define OUTGOING_PACKET    "TX"
+
+
+class Logger {
+public:
+    static Logger& getInstance();
+
+    void LogPacket(const std::string& direction, const std::string& clientIP, const Packet& pkt);
+
+    void LogMessage(const std::string& msg);
+
+private:
+    std::mutex mtx;
+
+
+    Logger();                
+    ~Logger();             
+
+    // Deleted copy constructor & assignment operator.
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
+
+    std::string PacketTypeToString(Packet::PacketType type);
+};

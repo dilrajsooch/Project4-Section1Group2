@@ -2,20 +2,34 @@
 #include <map>
 #include <string>
 
+struct UserInfo {
+    std::string password;
+    std::string accountID;
+};
+
+// Replace string-to-string map with string-to-UserInfo
+static std::map<std::string, UserInfo> testUsers = {
+    {"LeBron", {"Goat23", "1"}},
+    {"Curry",  {"Chef30", "2"}},
+    {"Kobe",   {"Mamba24", "3"}}
+};
+
 bool ValidateCredentials(const std::string& username, const std::string& password)
 {
-    // For local test data:
-    static std::map<std::string, std::string> testUsers = {
-        {"LeBron", "Goat23"},
-        {"Curry", "Chef30"},
-        {"Kobe", "Mamba24"}
-    };
-
     auto it = testUsers.find(username);
     if (it != testUsers.end())
     {
-        // If username found, compare password
-        return (it->second == password);
+        return (it->second.password == password);
     }
     return false;
+}
+
+std::string GetAccountID(const std::string& username)
+{
+    auto it = testUsers.find(username);
+    if (it != testUsers.end())
+    {
+        return it->second.accountID;
+    }
+    return ""; // Or throw or return a sentinel value
 }
