@@ -2,7 +2,6 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
-#include "raygui.h"
 
 enum PacketType
 {
@@ -116,7 +115,7 @@ public:
 	/// <param name="srcData">The text to be sent</param>
 	/// <param name="txtSize">The size of the text</param>
 	/// <param name="image">The image to be sent</param>
-	void SetBody(char* srcData, int txtSize, Image image)
+	void SetBody(char* srcData, int txtSize, unsigned char* image)
 	{
 
 		if (Body.postText)
@@ -134,7 +133,7 @@ public:
 			delete[] Body.imageData;
 		}
 		int exportedSize = 0;
-		Body.imageData = ExportImageToMemory(image, ".png", &exportedSize);
+		Body.imageData = image;
 
 		if (!Body.imageData)
 		{
@@ -150,9 +149,9 @@ public:
 	/// Gets the image from the packet
 	/// </summary>
 	/// <returns>Image</returns>
-	Image GetImage()
+	unsigned char* GetImage()
 	{
-		return LoadImageFromMemory(".png", Body.imageData, Head.imageSize);
+		return Body.imageData;
 	}
 
 	/// <summary>

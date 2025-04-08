@@ -1,12 +1,7 @@
-#define _WINSOCK_DEPRECATED_NO_WARNINGS // for gethostbyname, etc.
-
-#ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN
-#endif
-#ifndef NOMINMAX
-    #define NOMINMAX
-#endif
-
+#define WIN32_LEAN_AND_MEAN   // Exclude rarely-used Windows headers
+#define NOGDI             // All GDI defines and routines
+#define NOUSER            // All USER defines and routines
+#define NOMINMAX
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
