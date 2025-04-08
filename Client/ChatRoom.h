@@ -12,6 +12,11 @@ private:
 	string name;
 
 public:
+
+	ChatRoom(string name)
+	{
+		this->name = name;
+	}
 	/// <summary>
 	/// Sets the name of the chat room
 	/// </summary>
