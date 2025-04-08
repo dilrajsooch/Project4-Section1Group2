@@ -84,7 +84,9 @@ class CSocket
 				cerr << "ERROR: Failed to send packet." << endl;
 				closesocket(clientSocket);
 				WSACleanup();
-				return nullptr;
+				Packet failedPacket;
+				failedPacket.SetBody("-1", 2);
+				return failedPacket;
 			}
 			return RecievePacket();
 		}
@@ -95,7 +97,9 @@ class CSocket
 			if (recv(clientSocket, buffer, sizeof(buffer), 0) < 0)
 			{
 				cerr << "ERROR: Failed to recieve packet" << endl;
-				return nullptr;
+				Packet failedPacket;
+				failedPacket.SetBody("-1", 2);
+				return failedPacket;
 
 			}
 			Packet newPacket(buffer);

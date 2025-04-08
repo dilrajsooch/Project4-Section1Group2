@@ -55,6 +55,10 @@ public:
 	/// <param name="src">The byte array of the incomming packet</param>
 	Packet(char* src)
 	{
+		if (src == NULL)
+		{
+			return;
+		}
 		memcpy(&Head, src, sizeof(Head));
 		
 		if (Head.postTextSize > 0)

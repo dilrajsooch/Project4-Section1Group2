@@ -85,12 +85,37 @@ public:
             // Login panel logic
             if (GuiButton(loginButton, "Login")) {
                 // Handle login
-                std::string usernameStr(username);
-                std::string passwordStr(password);
-                // TODO: Implement login logic
-                std::cout << "Login attempted with: " << usernameStr << std::endl;
+                string usernameStr(username);
+                string passwordStr(password);
+                string body = usernameStr + "|" + passwordStr;
 
-                PageSystem::GetInstance()->SwitchToPage("Main Room");
+                if (usernameStr != "" && passwordStr != "")
+                {
+                    Packet loginPacket;
+                    loginPacket.SetType(AUTH_REQUEST);
+                    loginPacket.SetBody((char*)body.c_str(), (int)strlen(body.c_str()));
+    
+                    Packet result = CSocket::GetInstance()->SendPacket(loginPacket);      
+                    int code = atoi(result.GetText());
+
+
+                    if (code > 0)
+                    {
+                        // TODO: Set users id
+                        PageSystem::GetInstance()->SwitchToPage("Main Room");
+                    }
+                    else
+                    {
+                        error = "Failed to Login!";
+                    }
+                  
+                    std::cout << "Login attempted with: " << usernameStr << std::endl;
+                }
+                else
+                {
+                    error = "You must enter a username and password!";
+                }
+               
             }
 
             if (GuiTextBox(usernameBox, username, 128, loginUsernameEditMode))
@@ -115,12 +140,40 @@ public:
                 std::string confirmPasswordStr(regConfirmPassword);
                 
                 if (passwordStr == confirmPasswordStr) {
-                    // TODO: Implement registration logic
+                    string body = usernameStr + "|" + passwordStr + "|" + confirmPasswordStr;
+
+                    if (usernameStr != "" && passwordStr != "")
+                    {
+                        Packet loginPacket;
+                        loginPacket.SetType(AUTH_REQUEST);
+                        loginPacket.SetBody((char*)body.c_str(), (int)strlen(body.c_str()));
+
+                        Packet result = CSocket::GetInstance()->SendPacket(loginPacket);
+                        int code = atoi(result.GetText());
+
+
+                        if (code > 0)
+                        {
+                            // TODO: Set users id
+                            PageSystem::GetInstance()->SwitchToPage("Main Room");
+                        }
+                        else
+                        {
+                            error = "Failed to Register!";
+                        }
+
+                    }
+                    else
+                    {
+                        error = "You must enter a username and password!";
+                    }
                     std::cout << "Registration attempted with: " << usernameStr << std::endl;
                 } else {
-                    // TODO: Show error message
                     std::cout << "Passwords do not match!" << std::endl;
+                    error = "Passwords do not Match!";
                 }
+
+               
             }
 
             if (GuiTextBox(regUsernameBox, regUsername, 128, registerUsernameEditMode))
