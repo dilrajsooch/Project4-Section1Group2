@@ -1,5 +1,7 @@
 #pragma once
-
+#define WIN32_LEAN_AND_MEAN   // Exclude rarely-used Windows headers
+#define NOGDI             // All GDI defines and routines
+#define NOUSER            // All USER defines and routines
 #define NOMINMAX
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -12,11 +14,11 @@ using namespace std;
 class CSocket
 {
 	private:
-		const string IP = "172.16.5.12";
-		const int PORT = 25565;
+		
 		int clientSocket;
 		sockaddr_in SvrAddr;
-	public:
+		static CSocket* _instance;
+
 		CSocket()
 		{
 			// For windows, remove when moving to linux
@@ -38,9 +40,11 @@ class CSocket
 				return;
 			}
 
-			Connect(IP, PORT);
 		}
-		void Connect(const string& ip, int port)
+
+	public:
+		
+		int Connect(const string& ip, int port)
 		{
 			SvrAddr.sin_family = AF_INET;
 			SvrAddr.sin_port = htons(port);
@@ -50,7 +54,7 @@ class CSocket
 				cout << "ERROR: Invalid IP address format." << endl;
 				closesocket(clientSocket);
 				WSACleanup();
-				exit(1);
+				return -2;
 			}
 
 			if ((connect(clientSocket, (struct sockaddr*)&SvrAddr, sizeof(SvrAddr))) == -1)
@@ -58,9 +62,18 @@ class CSocket
 				closesocket(clientSocket);
 				WSACleanup();
 				cerr << "ERROR: Failed to connect to server." << endl;
-				exit(1);
-				return;
+				return -1;
 			}
+			return 1;
+		}
+
+		static CSocket* GetInstance()
+		{
+			if (_instance == nullptr)
+			{
+				_instance = new CSocket();
+			}
+			return _instance;
 		}
 
 		Packet SendPacket(Packet packet)
