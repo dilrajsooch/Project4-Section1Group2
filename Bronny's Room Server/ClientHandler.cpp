@@ -1,5 +1,6 @@
 // ClientHandler.cpp
 #include "ClientHandler.h"
+#include "include/GlobalDataModel.h"
 
 // Example session state for each client
 enum class ClientSessionState {
@@ -74,7 +75,10 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
     std::string clientIP = ipStr;
     int clientPort = ntohs(clientAddr.sin_port);
 
+
+    GlobalDataModel::getInstance().UserConnected();
     std::cout << "Client connected from " << clientIP << ":" << clientPort << "\n";
+    
 
     ClientSessionState sessionState = ClientSessionState::AUTH_PENDING;
 

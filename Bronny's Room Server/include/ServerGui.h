@@ -16,9 +16,7 @@ public:
     void RunLoop();
 
 private:
-    ServerModel& serverModel_;
-
-    void DrawServerInfo(const ServerState& state, cont int& count, const std::vector<std::string>& logs);
+    void DrawServerInfo(const ServerState& state, const int& count, const std::vector<std::string>& logs);
 
     std::string ServerStateToString(ServerState st);
 };

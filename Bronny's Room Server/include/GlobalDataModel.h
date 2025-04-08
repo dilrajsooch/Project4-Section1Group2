@@ -1,4 +1,5 @@
 #pragma once
+
 #include <mutex>        
 #include <string>       
 #include <vector>       
@@ -9,11 +10,19 @@
 
 class GlobalDataModel {
 public:
-    GlobalDataModel()
-        : p_totalConnected(0)
-        , p_state(ServerState::INITIALIZING) { }
+    GlobalDataModel(const GlobalDataModel&) = delete;
+    GlobalDataModel& operator=(const GlobalDataModel&) = delete;
+    GlobalDataModel(GlobalDataModel&&) = delete;
+    GlobalDataModel& operator=(GlobalDataModel&&) = delete;
 
-    //User Count functions
+    static GlobalDataModel& getInstance() {
+        static GlobalDataModel instance;
+        return instance;
+    }
+
+    // ---------------------------
+    // User Count Functions
+    // ---------------------------
     void UserConnected() {
         std::lock_guard<std::mutex> lock(p_connectedMutex);
         p_totalConnected++;
@@ -22,10 +31,14 @@ public:
         std::lock_guard<std::mutex> lock(p_connectedMutex);
         p_totalConnected--;
     }
-    int GetUserCount() { return p_totalConnected; }
+    int GetUserCount() {
+        std::lock_guard<std::mutex> lock(p_connectedMutex);
+        return p_totalConnected;
+    }
 
-
-    //Log functions
+    // ---------------------------
+    // Log Functions
+    // ---------------------------
     void AddLog(const std::string& msg) {
         std::lock_guard<std::mutex> lock(p_logMutex);
         p_logs.push_back(msg);
@@ -35,20 +48,26 @@ public:
         return p_logs;
     }
 
-
-    //State functions
+    // ---------------------------
+    // State Functions
+    // ---------------------------
     void SetState(ServerState state) {
         std::lock_guard<std::mutex> lock(p_stateMutex);
-        this->p_state = state;
+        p_state = state;
     }
     ServerState GetState() {
         std::lock_guard<std::mutex> lock(p_stateMutex);
         return p_state;
     }
 
-
-
 private:
+    // Private constructor for Singleton
+    GlobalDataModel()
+        : p_totalConnected(0)
+        , p_state(ServerState::INITIALIZING) {
+    }
+
+    // Data members
     int p_totalConnected;
     std::mutex p_connectedMutex;
 
@@ -57,5 +76,4 @@ private:
 
     ServerState p_state;
     std::mutex p_stateMutex;
-
 };

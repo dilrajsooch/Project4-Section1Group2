@@ -18,16 +18,13 @@
 
 #include "include/ServerState.h"
 #include "include/GlobalDataModel.h"
+#include "include/ServerGui.h"
 
 // Global or static variables
 static std::atomic_bool g_isRunning(true);
 
 // Forward declare
 void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr);
-
-
-//Global GUI Data Model
-GlobalDataModel g_DataModel;
 
 
 int main()
@@ -52,7 +49,7 @@ int main()
     sockaddr_in hint;
     hint.sin_family = AF_INET;
     hint.sin_port = htons(54000);
-    hint.sin_addr.s_addr = INADDR_ANY; // Listen on any network interface
+    hint.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(listenSocket, (sockaddr*)&hint, sizeof(hint)) == SOCKET_ERROR) {
         std::cerr << "bind() failed: " << WSAGetLastError() << std::endl;
@@ -68,6 +65,11 @@ int main()
         WSACleanup();
         return 1;
     }
+
+    // Start GUI Thread
+    ServerGUI gui;
+    gui.Init(200, 200);
+    gui.RunLoop();
 
     // We are up -> set server state to RUNNING
     SetServerState(ServerState::RUNNING);
@@ -90,7 +92,7 @@ int main()
 
         // 6) Spin up a thread to handle the new client
         std::thread t(ClientHandler, clientSocket, clientAddr);
-        t.detach(); // Let the thread run independently
+        t.detach();
     }
 
     // If we get here, we might be DEINITIALIZING...
