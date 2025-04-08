@@ -1,17 +1,6 @@
 // ClientHandler.cpp
-
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <iostream>
-#include <thread>
-#include <vector>
 #include "ClientHandler.h"
-#include "Packet.h"
-#include "Logging.h"
-#include "CredentialManager.h"
-#include "ServerState.h"
-
-#pragma comment(lib, "ws2_32.lib")
+#include "include/GlobalDataModel.h"
 
 // Example session state for each client
 enum class ClientSessionState {
@@ -86,7 +75,10 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
     std::string clientIP = ipStr;
     int clientPort = ntohs(clientAddr.sin_port);
 
+
+    GlobalDataModel::getInstance().UserConnected();
     std::cout << "Client connected from " << clientIP << ":" << clientPort << "\n";
+    
 
     ClientSessionState sessionState = ClientSessionState::AUTH_PENDING;
 
