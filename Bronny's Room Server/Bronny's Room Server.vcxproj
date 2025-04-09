@@ -110,10 +110,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\natha\OneDrive\Documents\Computer_Science\Year_Two\Semester_Two\Project_IV\Project4-Section1Group2\Bronny%27s Room Server\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\natha\OneDrive\Documents\Computer_Science\Year_Two\Semester_Two\Project_IV\Project4-Section1Group2\Bronny%27s Room Server\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>raylib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -138,6 +141,8 @@
     <ClCompile Include="GlobalDataModel.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="raygui_impl.cpp" />
+    <ClCompile Include="ServerGui.cpp" />
     <ClCompile Include="ServerState.cpp" />
   </ItemGroup>
   <ItemGroup>

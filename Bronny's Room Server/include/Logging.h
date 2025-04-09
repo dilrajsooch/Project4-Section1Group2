@@ -1,4 +1,5 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include <string>
 #include <mutex>
 #include "include/Packet.h"
@@ -11,7 +12,7 @@ class Logger {
 public:
     static Logger& getInstance();
 
-    void LogPacket(const std::string& direction, const std::string& clientIP, const Packet& pkt);
+    void LogPacket(const std::string& direction, const std::string& clientIP, Packet& pkt);
 
     void LogMessage(const std::string& msg);
 

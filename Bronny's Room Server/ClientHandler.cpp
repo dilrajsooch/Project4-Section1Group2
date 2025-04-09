@@ -75,7 +75,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
         // (6) Process the Packet
         switch (head.type)
         {
-        case AUTH_REQUEST:
+        case Packet::AUTH_REQUEST:
         {
             if (sessionState == ClientSessionState::AUTH_PENDING)
             {
@@ -118,7 +118,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             }
         } break;
 
-        case GET_ROOMS:
+        case Packet::GET_ROOMS:
         {
             if (sessionState != ClientSessionState::AUTHENTICATED)
             {
@@ -128,7 +128,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
 
         } break;
 
-        case ADD_ROOM:
+        case Packet::ADD_ROOM:
         {
             if (sessionState != ClientSessionState::AUTHENTICATED)
             {
@@ -137,7 +137,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             }
         } break;
 
-        case ADD_POST:
+        case Packet::ADD_POST:
         {
             if (sessionState != ClientSessionState::AUTHENTICATED)
             {
@@ -146,7 +146,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             }
         } break;
 
-        case DELETE_POST:
+        case Packet::DELETE_POST:
         {
             if (sessionState != ClientSessionState::AUTHENTICATED)
             {
@@ -155,7 +155,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             }
         } break;
 
-        case GET_POST:
+        case Packet::GET_POST:
         {
             if (sessionState != ClientSessionState::AUTHENTICATED)
             {

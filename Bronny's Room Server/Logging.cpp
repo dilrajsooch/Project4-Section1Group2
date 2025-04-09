@@ -26,7 +26,7 @@ std::string Logger::PacketTypeToString(Packet::PacketType type) {
     }
 }
 
-void Logger::LogPacket(const std::string& direction, const std::string& clientIP, const Packet& pkt) {
+void Logger::LogPacket(const std::string& direction, const std::string& clientIP, Packet& pkt) {
     std::lock_guard<std::mutex> lock(mtx);
 
     // Open the log file in append mode
