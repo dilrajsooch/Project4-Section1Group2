@@ -53,5 +53,32 @@ public:
 	{
 		posts.push_back(post);
 	}
+    	/// <summary>
+    	/// Gets all posts in the chat room
+    	/// </summary>
+    	/// <returns>Vector of Post objects</returns>
+    	vector<Post> GetPosts() const
+    	{
+        	return posts;
+    	}
+
+    	/// <summary>
+    	/// Searches for posts containing the specified keyword
+    	/// </summary>
+    	/// <param name="keyword">The keyword to search for</param>
+    	/// <returns>Vector of matching Post objects</returns>
+    	vector<Post> SearchPosts(const string& keyword)
+    	{
+        	vector<Post> results;
+        	for (const Post& post : posts)
+        	{
+            	if (post.GetText().find(keyword) != string::npos)
+            	{
+                	results.push_back(post);
+            	}
+        	}
+        	return results;
+    	}
+};
 
 };
