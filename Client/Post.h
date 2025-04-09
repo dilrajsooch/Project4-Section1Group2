@@ -1,7 +1,7 @@
 #pragma once
 #include "string"
 #include <raygui.h>
-
+#include "User.h"
 
 using namespace std;
 
@@ -14,10 +14,10 @@ private:
 	int roomNumber;
 	string text;
 	Image image;
-	string author;
+	User author;
 
 public:
-	Post(int roomNumber, string text, Image image, string author)
+	Post(int roomNumber, string text, Image image, User author)
 	{
 		this->roomNumber = roomNumber;
 		this->text = text;
@@ -40,7 +40,7 @@ public:
 		return image;
 	}
 
-	string GetAuthor()
+	User GetAuthor()
 	{
 		return author;
 	}

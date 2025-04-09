@@ -3,6 +3,7 @@
 #include "Page.h"
 #include <string>
 #include "CSocket.h"
+#include "User.h"
 
 class LoginPage : public Page {
 private:
@@ -92,7 +93,7 @@ public:
                 if (usernameStr != "" && passwordStr != "")
                 {
                     Packet loginPacket;
-                    loginPacket.SetType(Packet::AUTH_REQUEST);
+                    loginPacket.SetType(Packet::PacketType::AUTH_REQUEST);
                     loginPacket.SetBody((char*)body.c_str(), (int)strlen(body.c_str()));
     
                     Packet result = CSocket::GetInstance()->SendPacket(loginPacket);      
@@ -101,7 +102,8 @@ public:
 
                     if (code > 0)
                     {
-                        // TODO: Set users id
+                        User::MainUser.SetId(code);
+                        User::MainUser.SetUsername(usernameStr);
                         PageSystem::GetInstance()->SwitchToPage("Main Room");
                     }
                     else
@@ -115,7 +117,6 @@ public:
                 {
                     error = "You must enter a username and password!";
                 }
-               
             }
 
             if (GuiTextBox(usernameBox, username, 128, loginUsernameEditMode))
@@ -135,9 +136,9 @@ public:
             // Register panel logic
             if (GuiButton(submitRegisterButton, "Submit")) {
                 // Handle registration
-                std::string usernameStr(regUsername);
-                std::string passwordStr(regPassword);
-                std::string confirmPasswordStr(regConfirmPassword);
+                string usernameStr(regUsername);
+                string passwordStr(regPassword);
+                string confirmPasswordStr(regConfirmPassword);
                 
                 if (passwordStr == confirmPasswordStr) {
                     string body = usernameStr + "|" + passwordStr + "|" + confirmPasswordStr;
@@ -145,16 +146,17 @@ public:
                     if (usernameStr != "" && passwordStr != "")
                     {
                         Packet loginPacket;
-                        loginPacket.SetType(Packet::AUTH_REQUEST);
+                        loginPacket.SetType(Packet::PacketType::AUTH_REQUEST);
                         loginPacket.SetBody((char*)body.c_str(), (int)strlen(body.c_str()));
 
                         Packet result = CSocket::GetInstance()->SendPacket(loginPacket);
-                        int code = atoi(result.GetText());
+                        int code = atoi(result.GetText()); // Either gives an error code or returns the users id
 
 
                         if (code > 0)
                         {
-                            // TODO: Set users id
+                            User::MainUser.SetId(code);
+                            User::MainUser.SetUsername(usernameStr);
                             PageSystem::GetInstance()->SwitchToPage("Main Room");
                         }
                         else
@@ -168,7 +170,9 @@ public:
                         error = "You must enter a username and password!";
                     }
                     std::cout << "Registration attempted with: " << usernameStr << std::endl;
-                } else {
+                } 
+                else
+                {
                     std::cout << "Passwords do not match!" << std::endl;
                     error = "Passwords do not Match!";
                 }
