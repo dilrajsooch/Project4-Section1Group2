@@ -66,7 +66,7 @@ int main()
     // Start GUI Thread
     ServerGUI gui;
     gui.Init(200, 200);
-    gui.RunLoop();
+    std::thread guiThread(&ServerGUI::RunLoop, &gui);
 
     // We are up -> set server state to RUNNING
     SetServerState(ServerState::RUNNING);
@@ -96,6 +96,10 @@ int main()
     // 7) Clean up
     closesocket(listenSocket);
     WSACleanup();
+
+    if (guiThread.joinable()) {
+        guiThread.join();
+    }
 
     SetServerState(ServerState::TERMINATED);
     std::cout << "Server has terminated.\n";
