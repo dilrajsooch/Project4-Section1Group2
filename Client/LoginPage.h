@@ -92,7 +92,7 @@ public:
                 if (usernameStr != "" && passwordStr != "")
                 {
                     Packet loginPacket;
-                    loginPacket.SetType(AUTH_REQUEST);
+                    loginPacket.SetType(Packet::AUTH_REQUEST);
                     loginPacket.SetBody((char*)body.c_str(), (int)strlen(body.c_str()));
     
                     Packet result = CSocket::GetInstance()->SendPacket(loginPacket);      
@@ -145,7 +145,7 @@ public:
                     if (usernameStr != "" && passwordStr != "")
                     {
                         Packet loginPacket;
-                        loginPacket.SetType(AUTH_REQUEST);
+                        loginPacket.SetType(Packet::AUTH_REQUEST);
                         loginPacket.SetBody((char*)body.c_str(), (int)strlen(body.c_str()));
 
                         Packet result = CSocket::GetInstance()->SendPacket(loginPacket);
