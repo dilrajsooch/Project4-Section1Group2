@@ -2,6 +2,7 @@
 #include "PageSystem.h"
 #include "Packet.h"
 #include "Page.h"
+#include "CSocket.h"
 #include "ChatRoom.h"
 #include "vector"
 #include "CustomElements.h"
@@ -15,31 +16,38 @@ private:
     Vector2 roomChatPanelScrollOffset;
     vector<ChatRoom> chatRooms;
     ChatRoom selectedRoom;
+    char postText[256] = "";
+    bool postTextEditMode = false;
 
 
 public: 
-    RoomPage(std::string name) : Page(name), selectedRoom("Empty"), roomListPanelScrollOffset({ 0,0 }), roomChatPanelScrollOffset({ 0,0 }) {
+    RoomPage(std::string name) : Page(name), selectedRoom("Empty", -1), roomListPanelScrollOffset({ 0,0 }), roomChatPanelScrollOffset({ 0,0 }) {
         GetRooms();
     }
 
     void GetRooms()
     {
         // Test code
-        ChatRoom newChatroom("Test");
+        ChatRoom newChatroom("Test", 0);
         chatRooms.push_back(newChatroom);
 
         newChatroom.SetName("Test2");
+        newChatroom.SetRoomNumber(1);
+        User::MainUser.SetId(2);
+        User::MainUser.SetUsername("Jax");
+
+        Post post(2, "Hello everyone!", User::MainUser);
+
+        newChatroom.AddPost(post);
 
         chatRooms.push_back(newChatroom);
-
-            newChatroom.SetName("Test2");
         
         // Use socket here.
     }
 
 
     void Update() override {
-        // Add any update logic here
+        
     }
 
     void Draw() override {
@@ -56,8 +64,39 @@ public:
             {0, 0, 700, 672}, 
             &roomChatPanelScrollOffset, 
             &roomChatPanelScrollView);
+        DrawPosts();
         GuiLabel({ 370, 35, 120, 24 }, selectedRoom.GetName().c_str());
-        
+        if (GuiTextBox({ 100,400,600, 50 }, postText, 256, postTextEditMode))
+        {
+            postTextEditMode = !postTextEditMode;
+        }
+
+        if (GuiButton({ 700, 400, 100,50 }, "<<"))
+        {
+            if (strcmp(postText, "") == 0) return;
+
+            Packet pkt;
+            pkt.SetRoomNumber(selectedRoom.GetRoomNumber());
+            pkt.SetBody(postText, strlen(postText));
+            pkt.SetType(Packet::ADD_POST);
+
+            CSocket::GetInstance()->SendPacket(pkt);
+        }
+    }
+
+    void DrawPosts()
+    {
+        int postSpacing = 15;
+        for (int i = 0; i < selectedRoom.GetPostCount(); i++)
+        {
+            Post post = selectedRoom.GetPostByIndex(i);
+            float y = roomChatPanelScrollView.y + i * 300 + postSpacing + roomChatPanelScrollOffset.y;
+
+            if (GuiPost({ roomChatPanelScrollView.x, y }, post))
+            {
+                // reply logic here??
+            }
+        }
     }
 
     void DrawRoomButtons()

@@ -17,6 +17,13 @@ private:
 	User author;
 
 public:
+	Post(int roomNumber, string text, User author)
+	{
+		this->roomNumber = roomNumber;
+		this->text = text;
+		this->image = image;
+		this->author = author;
+	}
 	Post(int roomNumber, string text, Image image, User author)
 	{
 		this->roomNumber = roomNumber;
