@@ -88,7 +88,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
 
                 auto pos1 = creds.find("|");
                 auto pos2 = creds.find("|", pos1 + 1);
-                if (pos2 == std::string::npos) {
+                if (pos2 != std::string::npos) {
                     //Register
                     std::string user = creds.substr(0, pos1);
                     std::string pass = creds.substr(pos1 + 1);
