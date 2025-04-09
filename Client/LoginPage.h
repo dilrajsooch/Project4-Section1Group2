@@ -10,7 +10,7 @@ private:
 
     // Connection Details
     const string IP = "127.0.0.1";
-    const int PORT = 25565;
+    const int PORT = 54000;
 
     // Error Text
     string error = "";
@@ -99,7 +99,7 @@ public:
                     Packet result = CSocket::GetInstance()->SendPacket(loginPacket);      
                     int code = atoi(result.GetText());
 
-
+                    cout << code << endl;
                     if (code > 0)
                     {
                         User::MainUser.SetId(code);
