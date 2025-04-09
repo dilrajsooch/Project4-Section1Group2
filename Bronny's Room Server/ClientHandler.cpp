@@ -81,24 +81,52 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             {
                 std::string creds = pkt.GetText();
                 // Parse user/pass out of this
-                auto pos = creds.find("|");
-                std::string user = creds.substr(0, pos);
-                std::string pass = creds.substr(pos + 1);
-                
-                bool result = ValidateCredentials(user, pass);
+                std::string user;
+                std::string pass;
+                std::string passConfirm;
                 std::string userId;
 
+                auto pos1 = creds.find("|");
+                auto pos2 = creds.find("|", pos1 + 1);
+                if (pos2 == std::string::npos) {
+                    //Register
+                    std::string user = creds.substr(0, pos1);
+                    std::string pass = creds.substr(pos1 + 1);
+                    std::string confirmPass = creds.substr(0, pos2);
 
-                if (result == true)
-                {
-                    sessionState = ClientSessionState::AUTHENTICATED;
-                    std::cout << "Client " << clientIP << " authenticated successfully\n";
-                    userId = GetAccountID(user);
+                    bool result = RegisterCredentials(user, pass);
+
+                    if (result == true)
+                    {
+                        sessionState = ClientSessionState::AUTHENTICATED;
+                        std::cout << "Client " << clientIP << " registered successfully\n";
+                        userId = GetAccountID(user);
+                    }
+                    else
+                    {
+                        std::cout << "Client " << clientIP << " failed to register\n";
+                        userId = "-1";
+                    }
                 }
-                else
-                {
-                    std::cout << "Client " << clientIP << " failed authentication\n";
-                    userId = "-1";
+                else {
+                    //Login
+                    std::string user = creds.substr(0, pos1);
+                    std::string pass = creds.substr(pos1 + 1);
+
+                    bool result = ValidateCredentials(user, pass);
+
+
+                    if (result == true)
+                    {
+                        sessionState = ClientSessionState::AUTHENTICATED;
+                        std::cout << "Client " << clientIP << " authenticated successfully\n";
+                        userId = GetAccountID(user);
+                    }
+                    else
+                    {
+                        std::cout << "Client " << clientIP << " failed authentication\n";
+                        userId = "-1";
+                    }
                 }
 
                 // Create return packet
@@ -174,8 +202,6 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             std::cout << "Server shutting down. Closing client socket.\n";
             keepRunning = false;
         }
-
-        
     }
 
     closesocket(clientSocket);
