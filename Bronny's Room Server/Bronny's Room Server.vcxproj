@@ -116,7 +116,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectLib)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winhttp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,6 +144,7 @@
     <ClCompile Include="raygui_impl.cpp" />
     <ClCompile Include="ServerGui.cpp" />
     <ClCompile Include="ServerState.cpp" />
+    <ClCompile Include="SupabaseClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Client\Packet.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="include\CredentialManager.h" />
     <ClInclude Include="include\GlobalDataModel.h" />
     <ClInclude Include="include\Logging.h" />
+    <ClInclude Include="include\SupabaseClient.h" />
     <ClInclude Include="raygui.h" />
     <ClInclude Include="ServerState.h" />
   </ItemGroup>

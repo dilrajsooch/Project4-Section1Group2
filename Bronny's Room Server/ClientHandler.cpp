@@ -1,4 +1,5 @@
 #include "include/ClientHandler.h"
+#include "include/SupabaseClient.h"
 
 // Example session state for each client
 enum class ClientSessionState {
@@ -101,6 +102,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                         sessionState = ClientSessionState::AUTHENTICATED;
                         std::cout << "Client " << clientIP << " registered successfully\n";
                         userId = GetAccountID(user);
+                        SupabaseClient::Instance().LogLoginEvent(userId, user, clientIP);
                     }
                     else
                     {
@@ -121,6 +123,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                         sessionState = ClientSessionState::AUTHENTICATED;
                         std::cout << "Client " << clientIP << " authenticated successfully\n";
                         userId = GetAccountID(user);
+                        SupabaseClient::Instance().LogLoginEvent(userId, user, clientIP);
                     }
                     else
                     {
