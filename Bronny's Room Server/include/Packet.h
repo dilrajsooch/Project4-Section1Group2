@@ -32,7 +32,7 @@ public:
 	struct Body
 	{
 		char* postText; // The text of the post
-		unsigned char* imageData; // The data of the image
+		char* imageData; // The data of the image
 	} Body;
 
 	const int BASEPKTSIZE = sizeof(Header);
@@ -152,7 +152,7 @@ public:
 	/// Gets the image from the packet
 	/// </summary>
 	/// <returns>Image</returns>
-	unsigned char* GetImage()
+	char* GetImage()
 	{
 		return Body.imageData;
 	}
