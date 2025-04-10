@@ -1,4 +1,5 @@
 #include "include/ClientHandler.h"
+#include "RoomManager.h"
 
 // Example session state for each client
 enum class ClientSessionState {
@@ -153,6 +154,20 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                 std::cout << "Ignoring command from unauthenticated client\n";
                 continue;
             }
+            //Get rooms
+            std::string rooms = RoomManager::getInstance().getRooms();
+
+            //Create return packet
+            Packet packet;
+            packet.SetType(Packet::GET_ROOMS);
+            packet.SetBody(rooms.c_str(), static_cast<int>(rooms.size()));
+
+            //Log return packet
+            Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
+
+            //Send return packet
+            send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
+
 
         } break;
 
@@ -163,6 +178,28 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                 std::cout << "Ignoring command from unauthenticated client\n";
                 continue;
             }
+            int RoomId;
+            std::string RoomName = pkt.GetText();
+
+            RoomId = RoomManager::getInstance().addRoom(RoomName);
+
+
+            // Create return packet
+            Packet packet;
+            packet.SetType(Packet::ADD_ROOM);
+            packet.Head.userId = UserId;
+            packet.Head.roomNumber = RoomId;
+
+            packet.SetBody(reinterpret_cast<char*>(&RoomId), sizeof(RoomId));
+
+            // Log return packet
+            Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
+
+            //Send return packet
+            send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
+
+
+
         } break;
 
         case Packet::ADD_POST:
@@ -172,6 +209,32 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                 std::cout << "Ignoring command from unauthenticated client\n";
                 continue;
             }
+            //Get posts for room number
+            int RoomId = pkt.Head.roomNumber;
+            int UserId = pkt.Head.userId;
+            int PostId = 0;
+
+            if (pkt.Head.isImage) {
+                PostId = RoomManager::getInstance().addImage(RoomId, UserId, pkt.GetImage());
+            }
+            else {
+                PostId = RoomManager::getInstance().addMessage(RoomId, UserId, pkt.GetText());
+            }
+
+
+            // Create return packet
+            Packet packet;
+            packet.SetType(Packet::ADD_POST);
+            packet.Head.userId = UserId;
+            packet.Head.roomNumber = RoomId;
+
+            packet.SetBody(reinterpret_cast<char*>(&PostId), sizeof(PostId));
+
+            // Log return packet
+            Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
+
+            //Send return packet
+            send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
         } break;
 
         case Packet::DELETE_POST:
@@ -181,6 +244,28 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                 std::cout << "Ignoring command from unauthenticated client\n";
                 continue;
             }
+            //Get posts for room number
+            int RoomId = pkt.Head.roomNumber;
+            int UserId = pkt.Head.userId;
+            int PostId = std::atoi(pkt.GetText());
+
+            bool success = RoomManager::getInstance().deletePost(RoomId, PostId, UserId);
+
+
+            // Create return packet
+            Packet packet;
+            packet.SetType(Packet::DELETE_POST);
+            packet.Head.userId = UserId;
+            packet.Head.roomNumber = RoomId;
+
+            packet.SetBody(reinterpret_cast<char*>(&success), sizeof(success));
+
+            // Log return packet
+            Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
+
+            //Send return packet
+            send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
+
         } break;
 
         case Packet::GET_POST:
@@ -190,6 +275,22 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                 std::cout << "Ignoring command from unauthenticated client\n";
                 continue;
             }
+            //Get posts for room number
+            int RoomId = pkt.Head.roomNumber;
+            std::string posts = RoomManager::getInstance().getPosts(RoomId);
+
+            // Create return packet
+            Packet packet;
+            packet.SetType(Packet::GET_POST);
+            packet.Head.roomNumber = RoomId;
+
+            packet.SetBody(posts.c_str(), static_cast<int>(posts.size()));
+
+            // Log return packet
+            Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
+
+            //Send return packet
+            send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
         } break;
 
         default:

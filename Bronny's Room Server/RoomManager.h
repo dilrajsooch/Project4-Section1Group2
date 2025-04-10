@@ -5,13 +5,26 @@
 #include <mutex>
 #include <string>
 
-struct Message {
-    std::string message;
+struct Post {
+    bool IsImage;
+    char* Data;
+    int RoomId;
+    int PostId;
+    int UserId;
 };
 
 struct User {
     int id;
     int socket;
+};
+
+struct Room {
+    int id;
+    std::string name;
+
+    bool operator<(const Room& other) const {
+        return id < other.id;
+    }
 };
 
 class RoomManager {
@@ -22,20 +35,25 @@ public:
     RoomManager& operator=(const RoomManager&) = delete;
 
 
-    void addMessage(int roomId, const Message& msg);
+    int addMessage(int roomId, int userId, std::string msg);
+    int addImage(int roomId, int userId, char* img);
     void addUser(int roomId, const User& user);
+    int addRoom(std::string);
 
-    std::vector<Message> getMessages(int roomId);
+    std::string getPosts(int roomId);
     std::vector<User> getUsers(int roomId);
+    std::string getRooms();
 
-    bool deleteMessage(int roomId, size_t index);
+    bool deletePost(int roomId, int messageId, int userId);
 
 private:
     RoomManager();
     ~RoomManager();
 
-    std::map<int, std::vector<Message>> mMessages;
-    std::map<int, std::vector<User>> mUsers;
+    std::string SerializePosts(const std::vector<Post>& posts);
+
+    std::map<Room, std::vector<Post>> mMessages;
+    std::map<Room, std::vector<User>> mUsers;
 
     std::mutex mMessagesMutex;
     std::mutex mUsersMutex;

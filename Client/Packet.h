@@ -27,6 +27,8 @@ public:
 		int imageSize; // Size of the image
 		PacketType type; // The type of packet
 		int roomNumber; // The room to send this post to
+		int userId;
+		bool isImage;
 	} Head;
 
 	struct Body
@@ -95,6 +97,10 @@ public:
 		Head.type = type;
 	}
 
+	void SetUserId(int id) {
+		Head.userId = id;
+	}
+
 	/// <summary>
 	/// Sets the text of the body
 	/// </summary>
@@ -159,6 +165,10 @@ public:
 	unsigned char* GetImage()
 	{
 		return Body.imageData;
+	}
+
+	int GetUserId() {
+		return Head.userId;
 	}
 
 	/// <summary>
