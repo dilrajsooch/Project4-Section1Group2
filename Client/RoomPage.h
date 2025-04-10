@@ -35,16 +35,15 @@ public:
         newChatroom.SetName("Test2");
         newChatroom.SetRoomNumber(1);
         User::MainUser.SetId(2);
-        User::MainUser.SetUsername("Jax");
 
-        User newUser(3, "James");
+        User newUser(3);
 
-        Post post(2, "Hello everyone!", User::MainUser);
+        Post post(2, "Hello everyone!", User::MainUser.GetId());
        
 
         newChatroom.AddPost(post);
 
-        Post post2(3, "Hello everyone!", newUser);
+        Post post2(3, "Hello everyone!", newUser.GetId());
 
         newChatroom.AddPost(post2);
 

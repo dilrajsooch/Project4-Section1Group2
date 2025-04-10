@@ -32,7 +32,7 @@ int main() {
     pageSystem->AddPage(roomPage);
     
     // Start with the login page
-    pageSystem->SwitchToPage("Login");
+    pageSystem->SwitchToPage("Main Room");
     
     while (!WindowShouldClose())
     {

@@ -103,7 +103,6 @@ public:
                     if (code > 0)
                     {
                         User::MainUser.SetId(code);
-                        User::MainUser.SetUsername(usernameStr);
                         PageSystem::GetInstance()->SwitchToPage("Main Room");
                     }
                     else
@@ -156,7 +155,6 @@ public:
                         if (code > 0)
                         {
                             User::MainUser.SetId(code);
-                            User::MainUser.SetUsername(usernameStr);
                             PageSystem::GetInstance()->SwitchToPage("Main Room");
                         }
                         else

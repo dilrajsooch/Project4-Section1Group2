@@ -10,26 +10,26 @@ class Post
 {
 private:
 	int id;
-	int pid;
+	int userid;
 	int roomNumber;
+	bool isImage = false;
 	string text;
 	Image image;
-	User author;
 
 public:
-	Post(int roomNumber, string text, User author)
+	Post(int roomNumber, string text, int uid)
 	{
 		this->roomNumber = roomNumber;
 		this->text = text;
-		this->image = image;
-		this->author = author;
+		userid = uid;
 	}
-	Post(int roomNumber, string text, Image image, User author)
+
+	Post(int roomNumber,Image image, int uid)
 	{
+		isImage = true;
 		this->roomNumber = roomNumber;
-		this->text = text;
 		this->image = image;
-		this->author = author;
+		userid = uid;
 	}
 
 	int GetRoomNumber()
@@ -47,8 +47,14 @@ public:
 		return image;
 	}
 
-	User GetAuthor()
+	int GetUserID()
 	{
-		return author;
+		return userid;
 	}
+
+	void SetUserID(int userId)
+	{
+		this->userid = userId;
+	}
+
 };

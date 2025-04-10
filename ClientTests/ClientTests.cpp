@@ -186,32 +186,32 @@ namespace ClientTests
 		TEST_METHOD(Constructor_TextOnly_InitializesCorrectly)
 		{
 			// Create a test user
-			User testUser(0,"TestUser");
+			User testUser(0);
 			
 			// Create a post with just text
-			Post post(1, "Test post content", testUser);
+			Post post(1, "Test post content", testUser.GetId());
 			
 			// Verify the post was initialized correctly
 			Assert::AreEqual(1, post.GetRoomNumber());
 			Assert::AreEqual("Test post content", post.GetText().c_str());
-			Assert::AreEqual("TestUser", post.GetAuthor().GetUsername().c_str());
+			Assert::AreEqual(0, post.GetUserID());
 		}
 
 		TEST_METHOD(Constructor_WithImage_InitializesCorrectly)
 		{
 			// Create a test user
-			User testUser(0,"TestUser");
+			User testUser(0);
 			
 			// Create a test image
 			Image testImage = GenImageColor(100, 100, RED);
 			
 			// Create a post with text and image
-			Post post(2, "Test post with image", testImage, testUser);
+			Post post(2, "Test post with image", testUser.GetId());
 			
 			// Verify the post was initialized correctly
 			Assert::AreEqual(2, post.GetRoomNumber());
 			Assert::AreEqual("Test post with image", post.GetText().c_str());
-			Assert::AreEqual("TestUser", post.GetAuthor().GetUsername().c_str());
+			Assert::AreEqual(0, post.GetUserID());
 			
 			// Verify image was set (check if it's not a null image)
 			Image retrievedImage = post.GetImage();
@@ -220,28 +220,27 @@ namespace ClientTests
 
 		TEST_METHOD(GetRoomNumber_ReturnsCorrectValue)
 		{
-			User testUser(0,"TestUser");
-			Post post(42, "Test post", testUser);
+			User testUser(0);
+			Post post(42, "Test post", testUser.GetId());
 			
 			Assert::AreEqual(42, post.GetRoomNumber());
 		}
 
 		TEST_METHOD(GetText_ReturnsCorrectValue)
 		{
-			User testUser(0,"TestUser");
+			User testUser(0);
 			string testText = "This is a test post with special characters: !@#$%^&*()";
-			Post post(1, testText, testUser);
+			Post post(1, testText, testUser.GetId());
 			
 			Assert::AreEqual(testText.c_str(), post.GetText().c_str());
 		}
 
 		TEST_METHOD(GetAuthor_ReturnsCorrectUser)
 		{
-			User testUser(0,"TestUser");
-			Post post(1, "Test post", testUser);
+			User testUser(0);
+			Post post(1, "Test post", testUser.GetId());
 			
-			User author = post.GetAuthor();
-			Assert::AreEqual("TestUser", author.GetUsername().c_str());
+			Assert::AreEqual(0, post.GetUserID());
 		}
 	};
 }

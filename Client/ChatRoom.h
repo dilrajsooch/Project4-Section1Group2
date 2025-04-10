@@ -90,11 +90,11 @@ public:
 	/// <param name="text">Text of the post to be deleted</param>
 	/// <returns>True if deleted, false if not found or unauthorized</returns>
 
-	bool DeletePostByUser(const string& username, const string& text)
+	bool DeletePostByUser(const int& usid, const string& text)
 	{
     	for (auto it = posts.begin(); it != posts.end(); ++it)
     	{
-        	if (it->GetText() == text && it->GetAuthor().GetUsername() == username)
+        	if (it->GetText() == text && it->GetUserID() == usid)
         	{
             	posts.erase(it);
             	return true;

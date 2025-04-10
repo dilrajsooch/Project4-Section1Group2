@@ -84,29 +84,20 @@ int GuiPost(Vector2 point, Post post, bool* showPopup)
     DrawRectangleRec(postRect, backgroundColor);
     DrawRectangleLinesEx(postRect, 1, borderColor);
 
-    // Draw profile picture
-    User author = post.GetAuthor();
-    Image profilePic = author.GetProfilePic();
-    Texture2D profileTexture = LoadTextureFromImage(profilePic); // Consider caching this for performance
 
-    Rectangle dest = { point.x + padding, point.y + padding, (float)profilePicSize, (float)profilePicSize };
-    DrawTextureRec(profileTexture, { 0, 0, (float)profilePic.width, (float)profilePic.height }, { dest.x, dest.y }, WHITE);
 
     // Draw author name
-    string authorName = author.GetUsername();
-    DrawText(authorName.c_str(), (int)(dest.x + profilePicSize + spacing), (int)dest.y + 4, fontSize + 2, DARKGRAY);
 
     // Draw post text
     string postText = post.GetText();
-    int textY = (int)(dest.y + profilePicSize + spacing);
-    DrawText(postText.c_str(), (int)(point.x + padding), textY, fontSize, BLACK);
+    DrawText(postText.c_str(), (int)(point.x + padding), point.y, fontSize, BLACK);
 
     // Draw image if available
     Image postImg = post.GetImage();
     if (postImg.width > 0 && postImg.height > 0)
     {
         Texture2D postTexture = LoadTextureFromImage(postImg);
-        Rectangle imgDest = { point.x + padding, (float)(textY + 40), 200, 150 }; // Resize image
+        Rectangle imgDest = { point.x + padding, point.y + 40, 200, 150 }; // Resize image
         DrawTextureRec(postTexture, { 0, 0, (float)postImg.width, (float)postImg.height }, { imgDest.x, imgDest.y }, WHITE);
     }
 
@@ -120,7 +111,7 @@ int GuiPost(Vector2 point, Post post, bool* showPopup)
     };
 
 
-    if (post.GetAuthor().GetId() == User::MainUser.GetId())
+    if (post.GetUserID() == User::MainUser.GetId())
     {
         GuiDrawIcon(ICON_BIN, (int)trashBounds.x, (int)trashBounds.y, iconSize, RED);
     }
