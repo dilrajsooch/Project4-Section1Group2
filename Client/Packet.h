@@ -34,7 +34,7 @@ public:
 	struct Body
 	{
 		char* postText; // The text of the post
-		unsigned char* imageData; // The data of the image
+		char* imageData; // The data of the image
 	} Body;
 
 	const int BASEPKTSIZE = sizeof(Header);
@@ -74,7 +74,7 @@ public:
 
 		if (Head.imageSize > 0)
 		{
-			Body.imageData = new unsigned char[Head.imageSize];
+			Body.imageData = new char[Head.imageSize];
 			memcpy(Body.imageData, src + sizeof(Head) + Head.postTextSize, Head.imageSize);
 		}
 	}
@@ -106,63 +106,41 @@ public:
 	/// </summary>
 	/// <param name="srcData">The text to be sent</param>
 	/// <param name="Size">The size of the text</param>
-	void SetBody(const char* srcData, int Size)
+	void SetBody(const char* srcData, int Size, bool isImage = false)
 	{
-
-		if (Body.postText)
+		if (!isImage)
 		{
-			delete[] Body.postText;
+			if (Body.postText)
+			{
+				delete[] Body.postText;
+			}
+
+			Body.postText = new char[Size + 1];
+
+			memcpy(Body.postText, srcData, Size);
+			Body.postText[Size] = '\0';
+
+			Head.postTextSize = Size + 1;
+		}
+		else
+		{
+			if (Body.imageData)
+			{
+				delete[] Body.imageData;
+			}
+			Body.imageData = new char[Size];
+			memcpy(Body.imageData, srcData, Size);
+
+			Head.imageSize = Size;
 		}
 
-		Body.postText = new char[Size + 1];
-
-		memcpy(Body.postText, srcData, Size);
-		Body.postText[Size] = '\0';
-
-		Head.postTextSize = Size + 1;
-	}
-
-	/// <summary>
-	/// Sets the text and image of the body
-	/// </summary>
-	/// <param name="srcData">The text to be sent</param>
-	/// <param name="txtSize">The size of the text</param>
-	/// <param name="image">The image to be sent</param>
-	void SetBody(char* srcData, int txtSize, unsigned char* image)
-	{
-
-		if (Body.postText)
-		{
-			delete[] Body.postText;
-		}
-
-		Body.postText = new char[txtSize + 1];
-
-		memcpy(Body.postText, srcData, txtSize);
-		Body.postText[txtSize] = '\0';
-
-		if (Body.imageData)
-		{
-			delete[] Body.imageData;
-		}
-		int exportedSize = 0;
-		Body.imageData = image;
-
-		if (!Body.imageData)
-		{
-			Head.imageSize = 0;
-			return;
-		}
-
-		Head.postTextSize = txtSize;
-		Head.imageSize = exportedSize;
 	}
 
 	/// <summary>
 	/// Gets the image from the packet
 	/// </summary>
 	/// <returns>Image</returns>
-	unsigned char* GetImage()
+	char* GetImage()
 	{
 		return Body.imageData;
 	}

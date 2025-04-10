@@ -110,7 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,6 +142,7 @@
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="raygui_impl.cpp" />
+    <ClCompile Include="RoomManager.cpp" />
     <ClCompile Include="ServerGui.cpp" />
     <ClCompile Include="ServerState.cpp" />
   </ItemGroup>
@@ -152,6 +153,7 @@
     <ClInclude Include="include\GlobalDataModel.h" />
     <ClInclude Include="include\Logging.h" />
     <ClInclude Include="raygui.h" />
+    <ClInclude Include="RoomManager.h" />
     <ClInclude Include="ServerState.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

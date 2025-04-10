@@ -1,8 +1,10 @@
-#include "include/Logging.h"
+#include "Logging.h"
 #include <fstream>
 #include <ctime>
 #include <sstream>
 #include <iomanip>
+
+using namespace Server;
 
 Logger& Logger::getInstance() {
     static Logger instance;

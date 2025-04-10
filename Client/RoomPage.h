@@ -23,7 +23,7 @@ private:
 
 public: 
     RoomPage(std::string name) : Page(name), selectedRoom("Empty", -1), roomListPanelScrollOffset({ 0,0 }), roomChatPanelScrollOffset({ 0,0 }) {
-        GetRooms();
+   
     }
 
     void GetRooms()
@@ -50,11 +50,26 @@ public:
         chatRooms.push_back(newChatroom);
         
         // Use socket here.
+        Packet pkt;
+        pkt.SetType(Packet::GET_ROOMS);
+
+        char* roomsString = CSocket::GetInstance()->SendPacket(pkt).Body.postText;
+
+        char* roomsSplit = strtok(roomsString, "|");
+
+        while (roomsSplit != NULL && strcmp(roomsSplit, "-1") != 0)
+        {
+            cout << roomsSplit << endl;
+        }
+
     }
 
 
     void Update() override {
-        
+        if (chatRooms.size() == 0)
+        {
+            GetRooms();
+        }
     }
 
     void Draw() override {

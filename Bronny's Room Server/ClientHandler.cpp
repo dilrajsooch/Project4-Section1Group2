@@ -80,6 +80,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
         {
             if (sessionState == ClientSessionState::AUTH_PENDING)
             {
+                std::cout << "Shits happeneing\n";
                 std::string creds = pkt.GetText();
                 // Parse user/pass out of this
                 std::string user;
@@ -187,7 +188,6 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             // Create return packet
             Packet packet;
             packet.SetType(Packet::ADD_ROOM);
-            packet.Head.userId = UserId;
             packet.Head.roomNumber = RoomId;
 
             packet.SetBody(reinterpret_cast<char*>(&RoomId), sizeof(RoomId));

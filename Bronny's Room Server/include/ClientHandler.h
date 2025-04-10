@@ -16,7 +16,6 @@
 
 
 #include "ClientHandler.h"
-#include "include/Packet.h"
 #include "include/Logging.h"
 #include "include/CredentialManager.h"
 #include "include/ServerState.h"
