@@ -92,17 +92,26 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                 if (pos2 != std::string::npos) {
                     //Register
                     std::string user = creds.substr(0, pos1);
-                    std::string pass = creds.substr(pos1 + 1);
-                    std::string confirmPass = creds.substr(0, pos2);
+                    std::string pass = creds.substr(pos1 + 1, pos2 - pos1 - 1);
+                    std::string confirmPass = creds.substr(pos2 + 1);
 
-                    bool result = RegisterCredentials(user, pass);
-                    SupabaseClient::Instance().LogAuthAttempt(user, clientIP, result);
+                    bool created = false;
+                    std::string userId;
 
-                    if (result == true)
+                    if (pass == confirmPass)
+                    {
+                        created = RegisterCredentials(user, pass);           // <- hits Supabase
+                        if (created)
+                            userId = GetAccountID(user);                     // fetch uuid/int
+                    }
+
+                    SupabaseClient::Instance().LogAuthAttempt(user, clientIP, created);
+
+                    if (created)
                     {
                         sessionState = ClientSessionState::AUTHENTICATED;
                         std::cout << "Client " << clientIP << " registered successfully\n";
-                        userId = GetAccountID(user);
+
                         SupabaseClient::Instance().LogRegistration(userId, user, clientIP);
                         SupabaseClient::Instance().LogLoginEvent(userId, user, clientIP);
                     }
