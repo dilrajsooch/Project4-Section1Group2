@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "CppUnitTest.h"
-#include "../Client/Packet.h"
+#include "Packet.h"
 #include <cstring>
+#include <User.h>
+#include <Post.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -37,7 +39,7 @@ namespace ClientTests
 		TEST_METHOD(SetType_UpdatesCorrectly)
 		{
 			Packet packet;
-			PacketType testType = IMAGE_POST;
+			Packet::PacketType testType = Packet::ADD_POST;
 			
 			packet.SetType(testType);
 			
@@ -45,7 +47,7 @@ namespace ClientTests
 			char* serialized = packet.SerializeData();
 			Packet deserialized(serialized);
 			
-			Assert::AreEqual(1, (int)deserialized.Head.type);
+			Assert::AreEqual((int)Packet::ADD_POST, (int)deserialized.Head.type);
 			Assert::AreEqual(0, (int)(deserialized.GetSize() - sizeof(Packet::Header)));
 		}
 
@@ -69,7 +71,7 @@ namespace ClientTests
 			int textSize = strlen(testText);
 			
 			original.SetBody((char*)testText, textSize);
-			original.SetType(TEXT_POST);
+			original.SetType(Packet::ADD_POST);
 			original.SetRoomNumber(1);
 			
 			// Serialize and deserialize
@@ -103,7 +105,7 @@ namespace ClientTests
 			Assert::AreEqual(0, (int)header->postTextSize);
 			Assert::AreEqual(0, header->imageSize);
 			Assert::AreEqual(0, header->roomNumber);
-			Assert::AreEqual((int)TEXT_POST, (int)header->type);
+			Assert::AreEqual((int)Packet::ADD_POST, (int)header->type);
 		}
 
 		TEST_METHOD(Serialize_TextPacket_ContainsCorrectData)
@@ -139,7 +141,7 @@ namespace ClientTests
 		TEST_METHOD(Serialize_WithType_HeaderContainsCorrectValue)
 		{
 			Packet packet;
-			PacketType testType = IMAGE_POST;
+			Packet::PacketType testType = Packet::ADD_POST;
 			packet.SetType(testType);
 			
 			char* serialized = packet.SerializeData();
@@ -155,7 +157,7 @@ namespace ClientTests
 			int textSize = strlen(testText);
 
 			original.SetBody((char*)testText, textSize);
-			original.SetType(COMMAND);
+			original.SetType(Packet::ADD_POST);
 			original.SetRoomNumber(5);
 
 			// Serialize and deserialize
@@ -175,6 +177,71 @@ namespace ClientTests
 			Assert::AreEqual(originalHeader->imageSize, deserializedHeader->imageSize);
 			Assert::AreEqual(originalHeader->roomNumber, deserializedHeader->roomNumber);
 			Assert::AreEqual((int)originalHeader->type, (int)deserializedHeader->type);
+		}
+	};
+
+	TEST_CLASS(PostTests)
+	{
+	public:
+		TEST_METHOD(Constructor_TextOnly_InitializesCorrectly)
+		{
+			// Create a test user
+			User testUser(0,"TestUser");
+			
+			// Create a post with just text
+			Post post(1, "Test post content", testUser);
+			
+			// Verify the post was initialized correctly
+			Assert::AreEqual(1, post.GetRoomNumber());
+			Assert::AreEqual("Test post content", post.GetText().c_str());
+			Assert::AreEqual("TestUser", post.GetAuthor().GetUsername().c_str());
+		}
+
+		TEST_METHOD(Constructor_WithImage_InitializesCorrectly)
+		{
+			// Create a test user
+			User testUser(0,"TestUser");
+			
+			// Create a test image
+			Image testImage = GenImageColor(100, 100, RED);
+			
+			// Create a post with text and image
+			Post post(2, "Test post with image", testImage, testUser);
+			
+			// Verify the post was initialized correctly
+			Assert::AreEqual(2, post.GetRoomNumber());
+			Assert::AreEqual("Test post with image", post.GetText().c_str());
+			Assert::AreEqual("TestUser", post.GetAuthor().GetUsername().c_str());
+			
+			// Verify image was set (check if it's not a null image)
+			Image retrievedImage = post.GetImage();
+			Assert::IsTrue(retrievedImage.data != nullptr);
+		}
+
+		TEST_METHOD(GetRoomNumber_ReturnsCorrectValue)
+		{
+			User testUser(0,"TestUser");
+			Post post(42, "Test post", testUser);
+			
+			Assert::AreEqual(42, post.GetRoomNumber());
+		}
+
+		TEST_METHOD(GetText_ReturnsCorrectValue)
+		{
+			User testUser(0,"TestUser");
+			string testText = "This is a test post with special characters: !@#$%^&*()";
+			Post post(1, testText, testUser);
+			
+			Assert::AreEqual(testText.c_str(), post.GetText().c_str());
+		}
+
+		TEST_METHOD(GetAuthor_ReturnsCorrectUser)
+		{
+			User testUser(0,"TestUser");
+			Post post(1, "Test post", testUser);
+			
+			User author = post.GetAuthor();
+			Assert::AreEqual("TestUser", author.GetUsername().c_str());
 		}
 	};
 }
