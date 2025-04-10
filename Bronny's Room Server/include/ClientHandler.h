@@ -9,6 +9,8 @@
 #include <thread>
 #include <vector>
 #include <atomic>
+#include <vector>
+#include <map>
 
 #pragma comment(lib, "ws2_32.lib")
 

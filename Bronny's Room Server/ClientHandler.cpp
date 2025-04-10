@@ -70,7 +70,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
         Packet pkt(fullPacket.data());
 
         // (5) Log the incoming packet
-        Logger::getInstance().LogPacket(INCOMING_PACKET, clientIP, pkt);
+        Server::Logger::getInstance().LogPacket(INCOMING_PACKET, clientIP, pkt);
 
         // (6) Process the Packet
         switch (head.type)
@@ -135,7 +135,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                 packet.SetBody(userId.c_str(), (int)userId.size());
 
                 // Log return packet
-                Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
+                Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
 
                 //Send return packet
                 send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
