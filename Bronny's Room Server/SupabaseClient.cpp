@@ -104,6 +104,30 @@ bool SupabaseClient::RegisterUser(const std::string& username,
     return true;
 }
 
+void SupabaseClient::LogAuthAttempt(const std::string& username,
+    const std::string& ip,
+    bool succeeded)
+{
+    std::string body = std::string("[{")
+        + "\"username\":\"" + username + "\","
+        + "\"ip\":\"" + ip + "\","
+        + "\"succeeded\":" + (succeeded ? "true" : "false")
+        + "}]";
+    PostJson(L"/rest/v1/auth_attempts?return=minimal", body);
+}
+
+void SupabaseClient::LogRegistration(const std::string& accountId,
+    const std::string& username,
+    const std::string& ip)
+{
+    std::string body = std::string("[{")
+        + "\"account_id\":\"" + accountId + "\","
+        + "\"username\":\"" + username + "\","
+        + "\"ip\":\"" + ip + "\""
+        + "}]";
+    PostJson(L"/rest/v1/registration_events?return=minimal", body);
+}
+
 /* ───────── low‑level HTTPS helper ───────── */
 
 bool SupabaseClient::PostJson(const std::wstring& relPath,

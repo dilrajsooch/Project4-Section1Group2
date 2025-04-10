@@ -96,12 +96,14 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                     std::string confirmPass = creds.substr(0, pos2);
 
                     bool result = RegisterCredentials(user, pass);
+                    SupabaseClient::Instance().LogAuthAttempt(user, clientIP, result);
 
                     if (result == true)
                     {
                         sessionState = ClientSessionState::AUTHENTICATED;
                         std::cout << "Client " << clientIP << " registered successfully\n";
                         userId = GetAccountID(user);
+                        SupabaseClient::Instance().LogRegistration(userId, user, clientIP);
                         SupabaseClient::Instance().LogLoginEvent(userId, user, clientIP);
                     }
                     else
@@ -116,7 +118,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                     std::string pass = creds.substr(pos1 + 1);
 
                     bool result = ValidateCredentials(user, pass);
-
+                    SupabaseClient::Instance().LogAuthAttempt(user, clientIP, result);
 
                     if (result == true)
                     {
@@ -124,10 +126,12 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                         std::cout << "Client " << clientIP << " authenticated successfully\n";
                         userId = GetAccountID(user);
                         SupabaseClient::Instance().LogLoginEvent(userId, user, clientIP);
+                        SupabaseClient::Instance().LogAuthAttempt(user, clientIP, true);
                     }
                     else
                     {
                         std::cout << "Client " << clientIP << " failed authentication\n";
+                        SupabaseClient::Instance().LogAuthAttempt(user, clientIP, false);
                         userId = "-1";
                     }
                 }

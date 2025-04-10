@@ -34,6 +34,16 @@ public:
         const std::string& password,
         std::string& accountId /* out */);
 
+    // every attempt (success or failure)
+    void LogAuthAttempt(const std::string& username,
+        const std::string& ip,
+        bool succeeded);
+
+    // successful registration
+    void LogRegistration(const std::string& accountId,
+        const std::string& username,
+        const std::string& ip);
+
 
 private:
     SupabaseClient();                            // singleton – ctor is private
