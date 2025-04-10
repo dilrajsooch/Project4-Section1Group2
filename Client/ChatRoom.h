@@ -82,4 +82,24 @@ public:
 	{
 		return roomNumber;
 	}
+
+
+	/// <summary>
+	/// Deletes a post by a user, identified by matching username and post text
+	/// <param name="username">Username of the author</param>
+	/// <param name="text">Text of the post to be deleted</param>
+	/// <returns>True if deleted, false if not found or unauthorized</returns>
+
+	bool DeletePostByUser(const string& username, const string& text)
+	{
+    	for (auto it = posts.begin(); it != posts.end(); ++it)
+    	{
+        	if (it->GetText() == text && it->GetAuthor().GetUsername() == username)
+        	{
+            	posts.erase(it);
+            	return true;
+        	}
+    	}
+    	return false;
+}
 };
