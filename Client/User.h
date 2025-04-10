@@ -16,12 +16,14 @@ class User
 		{
 			this->id = 0;
 			this->userName = "";
+			this->profilePic = GenImageColor(32, 32, GRAY);
 		}
 
 		User(int id, string userName)
 		{
 			this->id = id;
 			this->userName = userName;
+			this->profilePic = GenImageColor(32, 32, GRAY);
 		}
 
 		User(int id, string userName, Image profilePic)

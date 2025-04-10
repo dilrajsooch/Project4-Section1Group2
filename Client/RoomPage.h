@@ -18,6 +18,7 @@ private:
     ChatRoom selectedRoom;
     char postText[256] = "";
     bool postTextEditMode = false;
+    bool showPopup = false;
 
 
 public: 
@@ -36,9 +37,16 @@ public:
         User::MainUser.SetId(2);
         User::MainUser.SetUsername("Jax");
 
+        User newUser(3, "James");
+
         Post post(2, "Hello everyone!", User::MainUser);
+       
 
         newChatroom.AddPost(post);
+
+        Post post2(3, "Hello everyone!", newUser);
+
+        newChatroom.AddPost(post2);
 
         chatRooms.push_back(newChatroom);
         
@@ -90,9 +98,9 @@ public:
         for (int i = 0; i < selectedRoom.GetPostCount(); i++)
         {
             Post post = selectedRoom.GetPostByIndex(i);
-            float y = roomChatPanelScrollView.y + i * 300 + postSpacing + roomChatPanelScrollOffset.y;
+            float y = roomChatPanelScrollView.y + i * ( 100 + postSpacing) + roomChatPanelScrollOffset.y;
 
-            if (GuiPost({ roomChatPanelScrollView.x, y }, post))
+            if (GuiPost({ roomChatPanelScrollView.x, y }, post, &showPopup))
             {
                 // reply logic here??
             }
