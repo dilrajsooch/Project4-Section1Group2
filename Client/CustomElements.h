@@ -61,6 +61,53 @@ int GuiPost(Vector2 point, Post post, bool* showPopup)
     const int postWidth = 460;
     const int postHeight = 100;
 
+    if (*showPopup)
+{
+    int popupWidth = 280;
+    int popupHeight = 120;
+    int screenWidth = GetScreenWidth();
+    int screenHeight = GetScreenHeight();
+
+    Rectangle popupBounds = {
+        (screenWidth - popupWidth) / 2.0f,
+        (screenHeight - popupHeight) / 2.0f,
+        (float)popupWidth,
+        (float)popupHeight
+    };
+
+    DrawRectangleRec(popupBounds, LIGHTGRAY);
+    DrawRectangleLinesEx(popupBounds, 2, GRAY);
+
+    const char* msg = "Are you sure you want to delete this post?";
+    int textWidth = MeasureText(msg, 10);
+    DrawText(msg, (int)(popupBounds.x + (popupWidth - textWidth) / 2), (int)(popupBounds.y + 20), 10, BLACK);
+
+    Rectangle yesBtn = {
+        popupBounds.x + 40,
+        popupBounds.y + popupHeight - 40,
+        80, 25
+    };
+    Rectangle noBtn = {
+        popupBounds.x + popupWidth - 120,
+        popupBounds.y + popupHeight - 40,
+        80, 25
+    };
+
+    if (GuiButton(yesBtn, "Yes"))
+    {
+        *showPopup = false;
+        return 2;  // Signal deletion
+    }
+
+    if (GuiButton(noBtn, "No"))
+    {
+        *showPopup = false;
+    }
+    return result; // 1 = clicked post, 2 = delete confirmed
+
+}
+
+
     // Update control
     //if (state != STATE_DISABLED)
     //{
