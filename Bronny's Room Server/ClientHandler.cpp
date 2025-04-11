@@ -215,12 +215,30 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             int UserId = pkt.Head.userId;
             int PostId = 0;
 
-            if (pkt.Head.isImage) {
-                PostId = RoomManager::getInstance().addImage(RoomId, UserId, pkt.GetImage());
+            const char* text = pkt.GetText();
+            if (text != nullptr && text[0] == '/') {
+                std::string logMessage = "Client " + clientIP + " requested a local image via command.";
+                Server::Logger::getInstance().LogMessage(logMessage);
+
+                std::ifstream file("resources/Lebron.jpg", std::ios::binary);
+                if (!file) {
+                    std::cout << "Failed to open local image file.\n";
+                    break;
+                }
+
+                // Read file contents into a vector.
+                file.seekg(0, std::ios::end);
+                size_t fileSize = file.tellg();
+                file.seekg(0, std::ios::beg);
+                std::vector<char> imageData(fileSize);
+                file.read(imageData.data(), fileSize);
+                file.close();
+                PostId = RoomManager::getInstance().addImage(RoomId, UserId, imageData.data());
             }
             else {
                 PostId = RoomManager::getInstance().addMessage(RoomId, UserId, pkt.GetText());
             }
+
 
 
             // Create return packet
