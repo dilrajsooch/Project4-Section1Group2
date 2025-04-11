@@ -31,29 +31,34 @@ std::string Logger::PacketTypeToString(Packet::PacketType type) {
 void Logger::LogPacket(const std::string& direction, const std::string& clientIP, Packet& pkt) {
     std::lock_guard<std::mutex> lock(mtx);
 
-    // Open the log file in append mode
+    //Open the log file in append mode
     std::ofstream log("server_log.txt", std::ios::app);
     if (!log.is_open())
         return;
 
-    // Get current time and format it.
+    //Get current time and format it.
     std::time_t t = std::time(nullptr);
     std::tm tm = *std::localtime(&t);
     char timeBuf[64];
     std::strftime(timeBuf, sizeof(timeBuf), "[%Y-%m-%d %H:%M:%S]", &tm);
 
-    // Convert the packet type to a string.
+    //Convert the packet type to a string.
     std::string typeStr = PacketTypeToString(pkt.GetType());
 
-    // Get packet text (make sure GetText() is not NULL).
+    //Get packet text (make sure GetText() is not NULL).
     const char* text = pkt.GetText();
     if (text == nullptr)
         text = "";
 
-    // Write a log entry.
-    log << timeBuf << " " << direction << " from " << clientIP
-        << " Type=" << typeStr
-        << " Text=" << text << "\n";
+    //Build the full log entry.
+    std::string fullLog = std::string(timeBuf) + " " + direction + " from " + clientIP +
+        " Type=" + typeStr + " Text=" + text;
+
+    //Write the log entry to the file.
+    log << fullLog << "\n";
+
+    //Also save the log entry to the global data model.
+    GlobalDataModel::getInstance().AddLog(fullLog);
 }
 
 void Logger::LogMessage(const std::string& msg) {
@@ -63,11 +68,18 @@ void Logger::LogMessage(const std::string& msg) {
     if (!log.is_open())
         return;
 
-    // Get current time and format it.
+    //Get current time and format it.
     std::time_t t = std::time(nullptr);
     std::tm tm = *std::localtime(&t);
     char timeBuf[64];
     std::strftime(timeBuf, sizeof(timeBuf), "[%Y-%m-%d %H:%M:%S]", &tm);
 
-    log << timeBuf << " [INFO] " << msg << "\n";
+    //Build the full log entry.
+    std::string fullLog = std::string(timeBuf) + " [INFO] " + msg;
+
+    //Write the log entry to the file.
+    log << fullLog << "\n";
+
+    //Also save the log entry to the global data model.
+    GlobalDataModel::getInstance().AddLog(fullLog);
 }

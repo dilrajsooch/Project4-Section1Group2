@@ -3,6 +3,7 @@
 #include <string>
 #include <mutex>
 #include "Packet.h"
+#include "GlobalDataModel.h"
 
 #define INCOMING_PACKET    "RX"
 #define OUTGOING_PACKET    "TX"
