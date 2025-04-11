@@ -107,10 +107,21 @@ public:
 		while (getline(postStream, postEntry, '|')) // split by '|'
 		{
 			istringstream entryStream(postEntry);
-			string postID, userID, postText;
+			string postID, userID, isImage, postText;
 
-			if (getline(entryStream, postID, ':') && getline(entryStream, userID, ':') && getline(entryStream, postText, ':'))
+			if (getline(entryStream, postID, ':') && getline(entryStream, userID, ':') && getline(entryStream, isImage, ':') )
 			{
+				bool isImageFlag = atoi(isImage.c_str());
+
+				if (isImageFlag)
+				{
+					// Image stuff here
+				}
+				else
+				{
+					getline(entryStream, postText, ':');
+				}
+
 				Post newPost(roomNumber, postText, atoi(userID.c_str()), atoi(postID.c_str()));
 				posts.push_back(newPost);
 			}

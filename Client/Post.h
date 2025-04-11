@@ -17,19 +17,21 @@ private:
 	Image image;
 
 public:
-	Post(int roomNumber, string text, int uid, int pid)
+	Post(int roomNumber, string text, int uid, int pid = 0)
 	{
 		this->roomNumber = roomNumber;
 		this->text = text;
 		userid = uid;
+		id = pid;
 	}
 
-	Post(int roomNumber,Image image, int uid, int pid)
+	Post(int roomNumber,Image image, int uid, int pid = 0)
 	{
 		isImage = true;
 		this->roomNumber = roomNumber;
 		this->image = image;
 		userid = uid;
+		id = pid;
 	}
 
 	int GetRoomNumber()
@@ -45,6 +47,11 @@ public:
 	Image GetImage()
 	{
 		return image;
+	}
+
+	int GetID()
+	{
+		return id;
 	}
 
 	int GetUserID()

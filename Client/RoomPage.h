@@ -25,6 +25,7 @@ private:
     bool showPopup = false;
     bool showCreateRoomPopup = false;
     bool hasGottenRooms = false;
+    bool resetRooms = false;
 
 
 public: 
@@ -68,6 +69,11 @@ public:
             GetRooms();
             hasGottenRooms = true;
         }
+        if (resetRooms)
+        {
+            GetRooms();
+            resetRooms = false;
+        }
     }
 
     void Draw() override {
@@ -89,6 +95,16 @@ public:
         if (GuiTextBox({ 100,400,600, 50 }, postText, 256, postTextEditMode))
         {
             postTextEditMode = !postTextEditMode;
+        }
+
+        if (GuiButton({700, 40, 32, 32}, GuiIconText(ICON_REPEAT_FILL, "")))
+        {
+            GetRooms();
+            
+            if (selectedRoom.GetRoomNumber() != -1)
+            {
+                selectedRoom.GetPosts();
+            }
         }
 
         if (GuiButton({ 25, 400, 50, 50 }, "+"))
@@ -173,6 +189,7 @@ public:
             pkt.SetRoomNumber(selectedRoom.GetRoomNumber());
             pkt.SetBody(postText, strlen(postText));
             pkt.SetType(Packet::ADD_POST);
+            pkt.Head.userId = User::MainUser.GetId();
 
             CSocket::GetInstance()->SendPacket(pkt);
 
@@ -189,7 +206,7 @@ public:
             Post post = selectedRoom.GetPostByIndex(i);
             float y = roomChatPanelScrollView.y + i * ( 100 + postSpacing) + roomChatPanelScrollOffset.y;
 
-            if (GuiPost({ roomChatPanelScrollView.x, y }, post, &showPopup))
+            if (GuiPost({ roomChatPanelScrollView.x, y }, post, &showPopup, &resetRooms))
             {
                 // reply logic here??
             }

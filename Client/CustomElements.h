@@ -1,7 +1,7 @@
 #pragma once
 #include "raygui.h"
 #include "raylib.h"
-
+#include <string>
 
 
 int GuiCircleButton(Vector2 point, float radius, const char* text)
@@ -47,7 +47,7 @@ int GuiCircleButton(Vector2 point, float radius, const char* text)
     return result;      // Button pressed: result = 1
 }
 
-int GuiPost(Vector2 point, Post post, bool* showPopup)
+int GuiPost(Vector2 point, Post post, bool* showPopup, bool* resetRooms)
 {
     int result = 0;
     int state = GuiGetState();
@@ -110,7 +110,6 @@ int GuiPost(Vector2 point, Post post, bool* showPopup)
         (float)iconSize  * 14
     };
 
-
     if (post.GetUserID() == User::MainUser.GetId())
     {
         GuiDrawIcon(ICON_BIN, (int)trashBounds.x, (int)trashBounds.y, iconSize, RED);
@@ -169,6 +168,17 @@ int GuiPost(Vector2 point, Post post, bool* showPopup)
         if (GuiButton(yesBtn, "Yes"))
         {
             *showPopup = false;
+            Packet pkt;
+            pkt.SetUserId(User::MainUser.GetId());
+            pkt.SetRoomNumber(post.GetRoomNumber());
+            cout << post.GetID() << endl;
+            std::string postId = std::to_string(post.GetID());
+            
+            pkt.SetBody(postId.c_str(), strlen(postId.c_str()));
+            pkt.SetType(Packet::DELETE_POST);
+
+            CSocket::GetInstance()->SendPacket(pkt);
+            *resetRooms = true;
         }
 
         if (GuiButton(noBtn, "No"))
