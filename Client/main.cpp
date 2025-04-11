@@ -10,7 +10,50 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+#include <thread>
+
+
 using namespace std;
+
+// after installing a socket connnection, in the main page
+
+
+void ListenForServerUpdates()
+{
+    while (true)
+    {
+        Packet packet = CSocket::GetInstance()->RecievePacket();
+        switch (packet.GetType())
+        {
+            case ADD_POST:
+            {
+                int roomNumber = packet.Head.roomNumber;
+                string postText(packet.GetText());
+                Image img = packet.GetImage();
+
+                Post newPost(roomNumber, postText, img, User("RemoteUser"));
+                // add routing code to RoomPage or a ChatRoom manager
+                break;
+            }
+
+            case ADD_ROOM:
+            {
+                string roomName(packet.GetText());
+                ChatRoom newRoom(roomName);
+                // TODO: Add RoomPage chatRooms 
+                break;
+            }
+
+            default:
+                break;
+        }
+    }
+}
+
+    //std::thread updateThread(ListenForServerUpdates);
+    //updateThread.detach(); after successful login put in main
+
+
 
 int main() {
     InitWindow(800, 450, "Bronny's Room");
