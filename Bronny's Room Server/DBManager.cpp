@@ -34,7 +34,10 @@ bool DatabaseManager::openDatabase(const std::string& dbName) {
         return false;
     }
 
-    std::cout << "Opened database and ensured Accounts table exists." << std::endl;
+    // Enable foreign key constraints
+    executeQuery("PRAGMA foreign_keys = ON;");
+
+    std::cout << "Opened database and ensured tables exist." << std::endl;
     const char* schema = R"(
     CREATE TABLE IF NOT EXISTS accounts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,10 +47,11 @@ bool DatabaseManager::openDatabase(const std::string& dbName) {
 
     CREATE TABLE IF NOT EXISTS login_log (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        account_id INTEGER,
-        username TEXT,
+        account_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
         ip TEXT,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
     );
     )";
 
