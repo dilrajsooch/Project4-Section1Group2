@@ -47,7 +47,7 @@ int GuiCircleButton(Vector2 point, float radius, const char* text)
     return result;      // Button pressed: result = 1
 }
 
-int GuiPost(Vector2 point, Post post, bool* showPopup, bool* resetRooms)
+int GuiPost(Vector2 point, Post post, int* selectedDeletePost, bool* resetRooms)
 {
     int result = 0;
     int state = GuiGetState();
@@ -61,20 +61,6 @@ int GuiPost(Vector2 point, Post post, bool* showPopup, bool* resetRooms)
     const int postWidth = 460;
     const int postHeight = 100;
 
-    // Update control
-    //if (state != STATE_DISABLED)
-    //{
-    //    Vector2 mousePoint = GetMousePosition();
-    //    Rectangle bounds = { point.x, point.y, postWidth, postHeight }; // Fixed height or adjust dynamically
-
-    //    if (CheckCollisionPointRec(mousePoint, bounds))
-    //    {
-    //        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) state = STATE_PRESSED;
-    //        else state = STATE_FOCUSED;
-
-    //        if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) result = 1;
-    //    }
-    //}
 
     // Draw background box
     Color borderColor = GetColor(GuiGetStyle(BUTTON, BORDER_COLOR_NORMAL + (state * 3)));
@@ -129,11 +115,11 @@ int GuiPost(Vector2 point, Post post, bool* showPopup, bool* resetRooms)
 
         if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) 
         {
-            *showPopup = true;
+            *selectedDeletePost = post.GetID();
         };
     }
 
-    if (*showPopup)
+    if (post.GetID() == *selectedDeletePost)
     {
         int popupWidth = 280;
         int popupHeight = 120;
@@ -167,11 +153,11 @@ int GuiPost(Vector2 point, Post post, bool* showPopup, bool* resetRooms)
 
         if (GuiButton(yesBtn, "Yes"))
         {
-            *showPopup = false;
+            *selectedDeletePost = -1;
             Packet pkt;
             pkt.SetUserId(User::MainUser.GetId());
             pkt.SetRoomNumber(post.GetRoomNumber());
-            cout << post.GetID() << endl;
+            
             std::string postId = std::to_string(post.GetID());
             
             pkt.SetBody(postId.c_str(), strlen(postId.c_str()));
@@ -183,7 +169,7 @@ int GuiPost(Vector2 point, Post post, bool* showPopup, bool* resetRooms)
 
         if (GuiButton(noBtn, "No"))
         {
-            *showPopup = false;
+            *selectedDeletePost = -1;
         }
     }
 

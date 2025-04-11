@@ -22,7 +22,7 @@ private:
     char createRoomText[128] = "";
     bool postTextEditMode = false;
     bool createRoomTextEditMode = false;
-    bool showPopup = false;
+    int selectedDeletePost = -1;
     bool showCreateRoomPopup = false;
     bool hasGottenRooms = false;
     bool resetRooms = false;
@@ -72,12 +72,14 @@ public:
         if (resetRooms)
         {
             GetRooms();
+            selectedRoom.GetPosts();
             resetRooms = false;
         }
     }
 
     void Draw() override {
         // Draw your room interface
+        
         
         GuiScrollPanel({ 0, 0, 100 , 470  }, 
             "Rooms", 
@@ -206,7 +208,7 @@ public:
             Post post = selectedRoom.GetPostByIndex(i);
             float y = roomChatPanelScrollView.y + i * ( 100 + postSpacing) + roomChatPanelScrollOffset.y;
 
-            if (GuiPost({ roomChatPanelScrollView.x, y }, post, &showPopup, &resetRooms))
+            if (GuiPost({ roomChatPanelScrollView.x, y }, post, &selectedDeletePost, &resetRooms))
             {
                 // reply logic here??
             }
