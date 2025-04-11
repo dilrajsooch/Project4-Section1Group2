@@ -21,6 +21,8 @@ public:
     void RunLoop();
 
 private:
+    int logScrollOffset = 0;
+
     void DrawServerInfo(const ServerState& state, const int& count, const std::vector<std::string>& logs);
 
     std::string ServerStateToString(ServerState st);
