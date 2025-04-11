@@ -99,7 +99,6 @@ public:
                     Packet result = CSocket::GetInstance()->SendPacket(loginPacket);      
                     int code = atoi(result.GetText());
 
-                    cout << code << endl;
                     if (code > 0)
                     {
                         User::MainUser.SetId(code);

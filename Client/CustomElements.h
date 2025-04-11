@@ -130,7 +130,6 @@ int GuiPost(Vector2 point, Post post, bool* showPopup)
 
         if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) 
         {
-            cout << "Trash Pressed" << endl;
             *showPopup = true;
         };
     }

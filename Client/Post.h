@@ -17,14 +17,14 @@ private:
 	Image image;
 
 public:
-	Post(int roomNumber, string text, int uid)
+	Post(int roomNumber, string text, int uid, int pid)
 	{
 		this->roomNumber = roomNumber;
 		this->text = text;
 		userid = uid;
 	}
 
-	Post(int roomNumber,Image image, int uid)
+	Post(int roomNumber,Image image, int uid, int pid)
 	{
 		isImage = true;
 		this->roomNumber = roomNumber;

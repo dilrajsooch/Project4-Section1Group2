@@ -11,7 +11,8 @@ struct UserInfo {
 static std::map<std::string, UserInfo> testUsers = {
     {"LeBron", {"Goat23", "1"}},
     {"Curry",  {"Chef30", "2"}},
-    {"Kobe",   {"Mamba24", "3"}}
+    {"Kobe",   {"Mamba24", "3"}},
+    {"test", {"test", "4"}}
 };
 
 bool ValidateCredentials(const std::string& username, const std::string& password)

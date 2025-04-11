@@ -146,7 +146,8 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             {
                 // Already authenticated?
             }
-        } break;
+            break;
+        } 
 
         case Packet::GET_ROOMS:
         {
@@ -168,9 +169,9 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
 
             //Send return packet
             send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
+            break;
 
-
-        } break;
+        } 
 
         case Packet::ADD_ROOM:
         {
@@ -198,9 +199,9 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             //Send return packet
             send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
 
+            break;
 
-
-        } break;
+        } 
 
         case Packet::ADD_POST:
         {
@@ -228,14 +229,16 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             packet.Head.userId = UserId;
             packet.Head.roomNumber = RoomId;
 
-            packet.SetBody(reinterpret_cast<char*>(&PostId), sizeof(PostId));
+            std::string postIdStr = std::to_string(PostId);
+            packet.SetBody(postIdStr.c_str(), postIdStr.size());
 
             // Log return packet
             Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
 
             //Send return packet
             send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
-        } break;
+            break;
+        } 
 
         case Packet::DELETE_POST:
         {
@@ -265,8 +268,8 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
 
             //Send return packet
             send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
-
-        } break;
+            break;
+        } 
 
         case Packet::GET_POST:
         {
@@ -284,18 +287,20 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             packet.SetType(Packet::GET_POST);
             packet.Head.roomNumber = RoomId;
 
-            packet.SetBody(posts.c_str(), static_cast<int>(posts.size()));
+            packet.SetBody(posts.c_str(), posts.size());
 
             // Log return packet
             Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
 
             //Send return packet
             send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
-        } break;
+            break;
+        } 
 
         default:
             std::cout << "Unknown packet type from client.\n";
-        } break;
+            break;
+        } 
 
         // (7) Check global server state
         if (GetServerState() == ServerState::DEINITIALIZING)

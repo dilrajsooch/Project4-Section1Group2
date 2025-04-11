@@ -2,6 +2,8 @@
 #include "string"
 #include "vector"
 #include "Post.h"
+#include <string>
+#include <sstream>
 
 class ChatRoom
 {
@@ -81,6 +83,39 @@ public:
 	int GetRoomNumber()
 	{
 		return roomNumber;
+	}
+
+	/// <summary>
+	/// Requests the posts from the server
+	/// </summary>
+	void GetPosts()
+	{
+		
+		posts.clear();
+
+		// Use socket here.
+		Packet pkt;
+		pkt.SetType(Packet::GET_POST);
+		pkt.SetRoomNumber(roomNumber);
+
+
+		char* postsString = CSocket::GetInstance()->SendPacket(pkt).Body.postText;
+
+		istringstream postStream(postsString);
+		string postEntry;
+
+		while (getline(postStream, postEntry, '|')) // split by '|'
+		{
+			istringstream entryStream(postEntry);
+			string postID, userID, postText;
+
+			if (getline(entryStream, postID, ':') && getline(entryStream, userID, ':') && getline(entryStream, postText, ':'))
+			{
+				Post newPost(roomNumber, postText, atoi(userID.c_str()), atoi(postID.c_str()));
+				posts.push_back(newPost);
+			}
+		}
+
 	}
 
 
