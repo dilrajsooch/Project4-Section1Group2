@@ -89,7 +89,7 @@ int main() {
     std::thread networkThread(RunNetworkServer);
 
     ServerGUI gui;
-    gui.Init(200, 200);
+    gui.Init(600, 600);
     //Blocking
     gui.RunLoop();
 
