@@ -6,6 +6,8 @@
 #include "ChatRoom.h"
 #include "vector"
 #include "CustomElements.h"
+#include <string>
+#include <sstream>
 
 class RoomPage : public Page {
 private:
@@ -17,8 +19,12 @@ private:
     vector<ChatRoom> chatRooms;
     ChatRoom selectedRoom;
     char postText[256] = "";
+    char createRoomText[128] = "";
     bool postTextEditMode = false;
+    bool createRoomTextEditMode = false;
     bool showPopup = false;
+    bool showCreateRoomPopup = false;
+    bool hasGottenRooms = false;
 
 
 public: 
@@ -28,47 +34,39 @@ public:
 
     void GetRooms()
     {
-        // Test code
-        ChatRoom newChatroom("Test", 0);
-        chatRooms.push_back(newChatroom);
+        chatRooms.clear();
 
-        newChatroom.SetName("Test2");
-        newChatroom.SetRoomNumber(1);
-        User::MainUser.SetId(2);
-
-        User newUser(3);
-
-        Post post(2, "Hello everyone!", User::MainUser.GetId());
-       
-
-        newChatroom.AddPost(post);
-
-        Post post2(3, "Hello everyone!", newUser.GetId());
-
-        newChatroom.AddPost(post2);
-
-        chatRooms.push_back(newChatroom);
-        
         // Use socket here.
         Packet pkt;
         pkt.SetType(Packet::GET_ROOMS);
 
+        
         char* roomsString = CSocket::GetInstance()->SendPacket(pkt).Body.postText;
 
-        char* roomsSplit = strtok(roomsString, "|");
+        istringstream roomStream(roomsString);
+        string roomEntry;
 
-        while (roomsSplit != NULL && strcmp(roomsSplit, "-1") != 0)
+        while (getline(roomStream, roomEntry, '|')) // split by '|'
         {
-            cout << roomsSplit << endl;
+            istringstream entryStream(roomEntry);
+            string roomID, roomName;
+
+            if (getline(entryStream, roomID, ':') && getline(entryStream, roomName, ':'))
+            {
+                cout << "Room ID: " << roomID << ", Name: " << roomName << endl;
+                ChatRoom newChatRoom(roomName, atoi(roomID.c_str()));
+                chatRooms.push_back(newChatRoom);
+            }
         }
 
     }
 
 
     void Update() override {
-        if (chatRooms.size() == 0)
+        if (!hasGottenRooms)
         {
             GetRooms();
+            hasGottenRooms = true;
         }
     }
 
@@ -93,9 +91,83 @@ public:
             postTextEditMode = !postTextEditMode;
         }
 
+        if (GuiButton({ 25, 400, 50, 50 }, "+"))
+        {
+            // Add Room Button
+            showCreateRoomPopup = true;
+        }
+
+        if (showCreateRoomPopup)
+        {
+            if (showCreateRoomPopup)
+            {
+                int popupWidth = 280;
+                int popupHeight = 120;
+                int screenWidth = GetScreenWidth();
+                int screenHeight = GetScreenHeight();
+
+                Rectangle popupBounds = {
+                    (screenWidth - popupWidth) / 2.0f,
+                    (screenHeight - popupHeight) / 2.0f,
+                    (float)popupWidth,
+                    (float)popupHeight
+                };
+
+                DrawRectangleRec(popupBounds, LIGHTGRAY);
+                DrawRectangleLinesEx(popupBounds, 2, GRAY);
+
+                const char* msg = "What is the name of the room you want to create?";
+                int textWidth = MeasureText(msg, 10);
+                DrawText(msg, (int)(popupBounds.x + (popupWidth - textWidth) / 2), (int)(popupBounds.y + 20), 10, BLACK);
+
+                if (GuiTextBox({ popupBounds.x + (popupWidth / 2) - 75 ,popupBounds.y + 40, 150, 25}, createRoomText, 128, createRoomTextEditMode))
+                {
+                    createRoomTextEditMode = !createRoomTextEditMode;
+                }
+
+                Rectangle yesBtn = {
+                    popupBounds.x + 40,
+                    popupBounds.y + popupHeight - 40,
+                    80, 25
+                };
+                Rectangle noBtn = {
+                    popupBounds.x + popupWidth - 120,
+                    popupBounds.y + popupHeight - 40,
+                    80, 25
+                };
+
+                if (GuiButton(yesBtn, "Yes"))
+                {
+                    showCreateRoomPopup = false;
+                    Packet pkt;
+                    pkt.SetType(Packet::ADD_ROOM);
+                    pkt.SetBody(createRoomText, strlen(createRoomText), false);
+
+                    Packet result = CSocket::GetInstance()->SendPacket(pkt);
+                    int code = atoi(result.GetText());
+                    if (code < 0)
+                    {
+                        cout << "Failed to create room" << endl;
+                    }
+                    else
+                    {
+                        cout << "Room created" << endl;
+                        GetRooms();
+                    }
+                    memset(createRoomText, 0, sizeof(createRoomText));
+                }
+
+                if (GuiButton(noBtn, "No"))
+                {
+                    showCreateRoomPopup = false;
+                    memset(createRoomText, 0, sizeof(createRoomText));
+                }
+            }
+        }
+
         if (GuiButton({ 700, 400, 100,50 }, "<<"))
         {
-            if (strcmp(postText, "") == 0) return;
+            if (strcmp(postText, "") == 0 || strcmp(selectedRoom.GetName().c_str(), "Empty") == 0) return;
 
             Packet pkt;
             pkt.SetRoomNumber(selectedRoom.GetRoomNumber());
@@ -103,6 +175,9 @@ public:
             pkt.SetType(Packet::ADD_POST);
 
             CSocket::GetInstance()->SendPacket(pkt);
+
+            memset(postText, 0, sizeof(postText));
+            selectedRoom.GetPosts();
         }
     }
 
@@ -141,6 +216,7 @@ public:
             if (GuiCircleButton({ roomListPanelScrollView.x + 40, y }, buttonRadius, chatRoom.GetName().c_str()))
             {
                 selectedRoom = chatRoom;
+                selectedRoom.GetPosts();
             }
 
         }
