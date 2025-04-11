@@ -118,14 +118,7 @@ public:
                 }
             }
 
-            if (GuiTextBox(usernameBox, username, 128, loginUsernameEditMode))
-            {
-                loginUsernameEditMode = !loginUsernameEditMode;
-            }
-            if (GuiTextBox(passwordBox, password, 128, loginPasswordEditMode))
-            {
-                loginPasswordEditMode = !loginPasswordEditMode;
-            }
+           
             
             
             if (GuiButton(registerButton, "Register")) {
@@ -178,18 +171,7 @@ public:
                
             }
 
-            if (GuiTextBox(regUsernameBox, regUsername, 128, registerUsernameEditMode))
-            {
-                registerUsernameEditMode = !registerUsernameEditMode;
-            }
-            if (GuiTextBox(regPasswordBox, regPassword, 128, registerPasswordEditMode))
-            {
-                registerPasswordEditMode = !registerPasswordEditMode;
-            }
-            if (GuiTextBox(regConfirmPasswordBox, regConfirmPassword, 128, registerConfirmPasswordEditMode))
-            {
-                registerConfirmPasswordEditMode = !registerConfirmPasswordEditMode;
-            }
+            
             
             if (GuiButton(backToLoginButton, "Back to Login")) {
                 isRegistering = false;
@@ -211,8 +193,15 @@ public:
             GuiLabel({ passwordBox.x, passwordBox.y - 20, 100, 20 }, "Password:");
             
             // Draw inputs
-            GuiTextBox(usernameBox, username, 128, loginUsernameEditMode);
-            GuiTextBox(passwordBox, password, 128, loginPasswordEditMode);
+
+            if (GuiTextBox(usernameBox, username, 128, loginUsernameEditMode))
+            {
+                loginUsernameEditMode = !loginUsernameEditMode;
+            }
+            if (GuiTextBox(passwordBox, password, 128, loginPasswordEditMode))
+            {
+                loginPasswordEditMode = !loginPasswordEditMode;
+            }
             
             // Draw buttons
             GuiButton(loginButton, "Login");
@@ -232,9 +221,18 @@ public:
             GuiLabel({ regConfirmPasswordBox.x, regConfirmPasswordBox.y - 20, 150, 20 }, "Confirm Password:");
             
             // Draw inputs
-            GuiTextBox(regUsernameBox, regUsername, 128, registerUsernameEditMode);
-            GuiTextBox(regPasswordBox, regPassword, 128, registerPasswordEditMode);
-            GuiTextBox(regConfirmPasswordBox, regConfirmPassword, 128, registerConfirmPasswordEditMode);
+            if (GuiTextBox(regUsernameBox, regUsername, 128, registerUsernameEditMode))
+            {
+                registerUsernameEditMode = !registerUsernameEditMode;
+            }
+            if (GuiTextBox(regPasswordBox, regPassword, 128, registerPasswordEditMode))
+            {
+                registerPasswordEditMode = !registerPasswordEditMode;
+            }
+            if (GuiTextBox(regConfirmPasswordBox, regConfirmPassword, 128, registerConfirmPasswordEditMode))
+            {
+                registerConfirmPasswordEditMode = !registerConfirmPasswordEditMode;
+            }
             
             // Draw buttons
             GuiButton(submitRegisterButton, "Submit");
