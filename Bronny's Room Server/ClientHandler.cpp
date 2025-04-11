@@ -1,11 +1,30 @@
 #include "include/ClientHandler.h"
 #include "RoomManager.h"
 
+#include <vector>
+
 // Example session state for each client
 enum class ClientSessionState {
     AUTH_PENDING,
     AUTHENTICATED
 };
+
+
+//TODO:
+//bool BroadcastToChannel(std::vector<User> userList, Post newPost) {
+//    for (User user : userList) {
+//        // Create return packet
+//        Packet packet;
+//        packet.SetType(Packet::);
+//        packet.SetBody(userId.c_str(), (int)userId.size());
+//
+//        // Log return packet
+//        Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
+//
+//        //Send return packet
+//        send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
+//    }
+//}
 
 
 void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
@@ -42,7 +61,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
         memcpy(&head, headerBuf, sizeof(Packet::Header));
 
         // (3) Receive the body, if any
-        int bodySize = head.postTextSize + head.imageSize; // from your Packet struct
+        int bodySize = head.postTextSize + head.imageSize;
         std::vector<char> bodyBuf(bodySize);
         if (bodySize > 0)
         {
@@ -275,8 +294,17 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
                 std::cout << "Ignoring command from unauthenticated client\n";
                 continue;
             }
-            //Get posts for room number
+            //Extract room number
+            int UserId = pkt.Head.userId;
             int RoomId = pkt.Head.roomNumber;
+
+            //Add this user to this room
+            User user;
+            user.id = UserId;
+            user.socket = clientSocket;
+            RoomManager::getInstance().addUser(RoomId, user);
+
+            //Get posts for room number
             std::string posts = RoomManager::getInstance().getPosts(RoomId);
 
             // Create return packet

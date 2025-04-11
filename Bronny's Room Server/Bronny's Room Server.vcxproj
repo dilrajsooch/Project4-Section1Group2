@@ -152,8 +152,8 @@
     <ClInclude Include="include\CredentialManager.h" />
     <ClInclude Include="include\GlobalDataModel.h" />
     <ClInclude Include="include\Logging.h" />
+    <ClInclude Include="include\RoomManager.h" />
     <ClInclude Include="raygui.h" />
-    <ClInclude Include="RoomManager.h" />
     <ClInclude Include="ServerState.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

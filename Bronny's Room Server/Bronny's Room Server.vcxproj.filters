@@ -65,7 +65,7 @@
     <ClInclude Include="include\GlobalDataModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RoomManager.h">
+    <ClInclude Include="include\RoomManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
