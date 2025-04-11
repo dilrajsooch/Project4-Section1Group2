@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sqlite3.h>
+#include "extern/sqlite3.h"
 #include <string>
 
 class DatabaseManager {

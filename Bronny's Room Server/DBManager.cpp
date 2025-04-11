@@ -33,8 +33,27 @@ bool DatabaseManager::openDatabase(const std::string& dbName) {
         db = nullptr;
         return false;
     }
-    else {
-        std::cout << "Opened database successfully" << std::endl;
+
+    std::cout << "Opened database and ensured Accounts table exists." << std::endl;
+    const char* schema = R"(
+    CREATE TABLE IF NOT EXISTS accounts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS login_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        account_id INTEGER,
+        username TEXT,
+        ip TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    )";
+
+    if (!executeQuery(schema)) {
+        std::cerr << "Failed to initialize database schema." << std::endl;
+        return false;
     }
     return true;
 }

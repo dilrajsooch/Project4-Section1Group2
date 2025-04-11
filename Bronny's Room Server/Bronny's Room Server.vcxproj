@@ -138,6 +138,7 @@
   <ItemGroup>
     <ClCompile Include="ClientHandler.cpp" />
     <ClCompile Include="CredentialManager.cpp" />
+    <ClCompile Include="DBManager.cpp" />
     <ClCompile Include="GlobalDataModel.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="main.cpp" />
@@ -149,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="..\Client\Packet.h" />
     <ClInclude Include="ClientHandler.h" />
+    <ClInclude Include="DBManager.h" />
     <ClInclude Include="include\CredentialManager.h" />
     <ClInclude Include="include\GlobalDataModel.h" />
     <ClInclude Include="include\Logging.h" />
