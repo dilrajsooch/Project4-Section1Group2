@@ -2,6 +2,7 @@
 #include <cstring>
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 
 RoomManager& RoomManager::getInstance() {
     static RoomManager instance;
@@ -170,13 +171,8 @@ bool RoomManager::deletePost(int roomId, int messageId, int userId) {
 std::string RoomManager::SerializePosts(const std::vector<Post>& posts) {
     std::ostringstream oss;
     for (size_t i = 0; i < posts.size(); i++) {
-        oss << posts[i].PostId << ":" << posts[i].UserId << ":";
-        if (posts[i].IsImage) {
-            oss << "[image]";
-        }
-        else {
-            oss << posts[i].Data;
-        }
+        oss << posts[i].PostId << ":" << posts[i].UserId << ":"  << posts[i].IsImage << ":";
+        oss << posts[i].Data;
         if (i != posts.size() - 1) {
             oss << "|";
         }
