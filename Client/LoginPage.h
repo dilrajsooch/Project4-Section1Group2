@@ -9,7 +9,7 @@ class LoginPage : public Page {
 private:
 
     // Connection Details
-    const string IP = "127.0.0.1";
+    string IP = "127.0.0.1";
     const int PORT = 54000;
 
     // Error Text
@@ -48,7 +48,13 @@ private:
     bool registerConfirmPasswordEditMode = false;
 
 public:
-    LoginPage(std::string name) : Page(name) {
+    LoginPage(std::string name, string ip) : Page(name) {
+
+        cout << ip << endl;
+        if (strcmp(ip.c_str(), "") != 0)
+        {
+            IP = ip;
+        }
 
         // Connect to server
         int err = CSocket::GetInstance()->Connect(IP, PORT);
