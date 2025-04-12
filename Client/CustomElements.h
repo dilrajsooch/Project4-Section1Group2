@@ -2,6 +2,11 @@
 #include "raygui.h"
 #include "raylib.h"
 #include <string>
+#include "ImageCache.h"
+#include "Post.h"
+#include "User.h"
+#include "Packet.h"
+#include "CSocket.h"
 
 
 int GuiCircleButton(Vector2 point, float radius, const char* text)
@@ -61,9 +66,16 @@ int GuiPost(Vector2 point, Post post, int* selectedDeletePost, bool* resetRooms)
     Image postImg = post.GetImage();
     if (postImg.width > 0 && postImg.height > 0)
     {
-        Texture2D postTexture = LoadTextureFromImage(postImg);
-        Rectangle imgDest = { point.x + padding, point.y + 40, 200, 150 };
-        DrawTextureRec(postTexture, { 0, 0, (float)postImg.width, (float)postImg.height }, { imgDest.x, imgDest.y }, WHITE);
+        // Only use the image cache for valid images
+        if (postImg.data != nullptr)
+        {
+            // Use the image cache to get or create the texture
+            Texture2D postTexture = ImageCache::GetInstance()->GetTexture(post.GetID(), postImg);
+            
+            // Draw the texture
+            Rectangle imgDest = { point.x + padding, point.y + 40, 128, 128 };
+            DrawTextureRec(postTexture, { 0, 0, 128, 128 }, { imgDest.x, imgDest.y }, WHITE);
+        }
     }
 
     Rectangle trashBounds = {
@@ -129,6 +141,10 @@ int GuiPost(Vector2 point, Post post, int* selectedDeletePost, bool* resetRooms)
             pkt.SetBody(postId.c_str(), strlen(postId.c_str()));
             pkt.SetType(Packet::DELETE_POST);
             CSocket::GetInstance()->SendPacket(pkt);
+            
+            // Clean up the cached texture for this post
+            ImageCache::GetInstance()->RemoveTexture(post.GetID());
+            
             *resetRooms = true;
         }
 

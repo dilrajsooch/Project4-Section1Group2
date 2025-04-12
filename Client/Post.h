@@ -23,9 +23,12 @@ public:
 		this->text = text;
 		userid = uid;
 		id = pid;
+		
+		// Initialize image to a safe empty state
+		image = {0};
 	}
 
-	Post(int roomNumber,Image image, int uid, int pid = 0)
+	Post(int roomNumber, Image image, int uid, int pid = 0)
 	{
 		isImage = true;
 		this->roomNumber = roomNumber;

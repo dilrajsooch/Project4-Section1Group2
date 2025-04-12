@@ -74,6 +74,7 @@ public:
 
 		if (Head.imageSize > 0)
 		{
+			std::cout << "Image size: " << Head.imageSize << std::endl;
 			Body.imageData = new char[Head.imageSize];
 			memcpy(Body.imageData, src + sizeof(Head) + Head.postTextSize, Head.imageSize);
 		}

@@ -6,6 +6,7 @@
 #include "RoomPage.h"
 #include "LoginPage.h"
 #include "CSocket.h"
+#include "ImageCache.h"
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
@@ -54,6 +55,9 @@ int main(int argc, char* argv[])
         EndDrawing();
     }
 
+    // Clean up resources
+    ImageCache::GetInstance()->Cleanup();
+    
     CloseWindow();
     return 0;
 }

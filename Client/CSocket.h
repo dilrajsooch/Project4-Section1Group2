@@ -93,16 +93,52 @@ class CSocket
 
 		Packet RecievePacket()
 		{
-			char buffer[1024]; // Not sure what the size should be
-			if (recv(clientSocket, buffer, sizeof(buffer), 0) < 0)
+			// First receive the header to determine the total packet size
+			char headerBuffer[sizeof(Packet::Header)];
+			if (recv(clientSocket, headerBuffer, sizeof(Packet::Header), 0) < 0)
 			{
-				cerr << "ERROR: Failed to recieve packet" << endl;
+				cerr << "ERROR: Failed to receive packet header" << endl;
 				Packet failedPacket;
 				failedPacket.SetBody("-1", 2);
 				return failedPacket;
-
 			}
+
+			// Parse the header to get the total size
+			Packet::Header header;
+			memcpy(&header, headerBuffer, sizeof(Packet::Header));
+			
+			int totalSize = sizeof(Packet::Header) + header.postTextSize + header.imageSize;
+			
+			// Allocate a buffer for the entire packet
+			char* buffer = new char[totalSize];
+			
+			// Copy the header we already received
+			memcpy(buffer, headerBuffer, sizeof(Packet::Header));
+			
+			// Receive the rest of the packet
+			int bytesReceived = 0;
+			int remainingBytes = totalSize - sizeof(Packet::Header);
+			
+			while (bytesReceived < remainingBytes)
+			{
+				int result = recv(clientSocket, buffer + sizeof(Packet::Header) + bytesReceived, 
+					remainingBytes - bytesReceived, 0);
+				
+				if (result <= 0)
+				{
+					cerr << "ERROR: Failed to receive packet body" << endl;
+					delete[] buffer;
+					Packet failedPacket;
+					failedPacket.SetBody("-1", 2);
+					return failedPacket;
+				}
+				
+				bytesReceived += result;
+			}
+			
+			// Create a new packet from the complete data
 			Packet newPacket(buffer);
+			delete[] buffer;
 			return newPacket;
 		}
 };

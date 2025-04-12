@@ -33,8 +33,10 @@ int RoomManager::addMessage(int roomId, int userId, std::string msg) {
     post.IsImage = false;
     post.RoomId = roomId;
     post.UserId = userId;
+    
     int length = static_cast<int>(msg.size());
     post.Data = new char[length + 1];
+    post.size = length;
     std::copy(msg.begin(), msg.end(), post.Data);
     post.Data[length] = '\0';
 
@@ -44,7 +46,7 @@ int RoomManager::addMessage(int roomId, int userId, std::string msg) {
     return post.PostId;
 }
 
-int RoomManager::addImage(int roomId, int userId, char* img) {
+int RoomManager::addImage(int roomId, int userId, char* img, int size) {
     std::lock_guard<std::mutex> lock(mMessagesMutex);
 
     Room key;
@@ -57,11 +59,11 @@ int RoomManager::addImage(int roomId, int userId, char* img) {
     post.IsImage = true;
     post.RoomId = roomId;
     post.UserId = userId;
+    post.size = size;
 
-    int length = static_cast<int>(std::strlen(img));
-    post.Data = new char[length + 1];
-    std::copy(img, img + length, post.Data);
-    post.Data[length] = '\0';
+    // Don't add null terminator for binary data
+    post.Data = new char[size];
+    std::copy(img, img + size, post.Data);
 
     post.PostId = static_cast<int>(posts.size()) + 1;
     posts.push_back(post);
@@ -171,11 +173,39 @@ bool RoomManager::deletePost(int roomId, int messageId, int userId) {
 std::string RoomManager::SerializePosts(const std::vector<Post>& posts) {
     std::ostringstream oss;
     for (size_t i = 0; i < posts.size(); i++) {
-        oss << posts[i].PostId << ":" << posts[i].UserId << ":"  << posts[i].IsImage << ":";
-        oss << posts[i].Data;
+        oss << posts[i].PostId << ":" << posts[i].UserId << ":"  << posts[i].IsImage << ":" << posts[i].size << ":";
+        
+        // For image posts, don't include the binary data in the string
+        if (!posts[i].IsImage) {
+            oss << posts[i].Data;
+        } else {
+            // For images, just include a placeholder
+            oss << "[IMAGE_DATA]";
+        }
+        
         if (i != posts.size() - 1) {
             oss << "|";
         }
     }
     return oss.str();
+}
+
+std::vector<Post> RoomManager::getImagePosts(int roomId) {
+    std::lock_guard<std::mutex> lock(mMessagesMutex);
+
+    Room key;
+    key.id = roomId;
+    key.name = "";
+
+    auto it = mMessages.find(key);
+    if (it != mMessages.end()) {
+        std::vector<Post> imagePosts;
+        for (const auto& post : it->second) {
+            if (post.IsImage) {
+                imagePosts.push_back(post);
+            }
+        }
+        return imagePosts;
+    }
+    return std::vector<Post>();
 }
