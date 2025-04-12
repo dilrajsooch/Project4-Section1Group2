@@ -107,23 +107,52 @@ public:
 		while (getline(postStream, postEntry, '|')) // split by '|'
 		{
 			istringstream entryStream(postEntry);
-			string postID, userID, isImage, postText;
+			string postID, userID, isImage, postText, size;
 
-			if (getline(entryStream, postID, ':') && getline(entryStream, userID, ':') && getline(entryStream, isImage, ':') )
+			if (getline(entryStream, postID, ':') && getline(entryStream, userID, ':') && getline(entryStream, isImage, ':') && getline(entryStream, size, ':'))
 			{
 				bool isImageFlag = atoi(isImage.c_str());
+				int dataSize = atoi(size.c_str());
 
 				if (isImageFlag)
 				{
-					// Image stuff here
+					// For image posts, we need to receive a separate packet with the image data
+					cout << "Waiting for image data of size: " << dataSize << endl;
+
+					// Receive the image packet
+					Packet imagePacket = CSocket::GetInstance()->RecievePacket();
+
+					if (imagePacket.Head.isImage && imagePacket.Head.imageSize > 0)
+					{
+						cout << "Received image packet with size: " << imagePacket.Head.imageSize << endl;
+
+						// Save the image to a file
+						std::ofstream outFile("received_image.jpg", std::ios::binary);
+						if (!outFile) {
+							std::cerr << "Failed to open file for writing" << std::endl;
+							continue;
+						}
+
+						outFile.write(imagePacket.GetImage(), imagePacket.Head.imageSize);
+						outFile.close();
+						std::cout << "Image saved as received_image.jpg" << std::endl;
+
+						// Load the image into memory
+						Image img = LoadImageFromMemory(".jpg", (unsigned char*)imagePacket.GetImage(), imagePacket.Head.imageSize);
+						Post newPost(roomNumber, img, atoi(userID.c_str()), atoi(postID.c_str()));
+						posts.push_back(newPost);
+					}
+					else
+					{
+						std::cerr << "Received invalid image packet" << std::endl;
+					}
 				}
 				else
 				{
 					getline(entryStream, postText, ':');
+					Post newPost(roomNumber, postText, atoi(userID.c_str()), atoi(postID.c_str()));
+					posts.push_back(newPost);
 				}
-
-				Post newPost(roomNumber, postText, atoi(userID.c_str()), atoi(postID.c_str()));
-				posts.push_back(newPost);
 			}
 		}
 
@@ -149,4 +178,3 @@ public:
     	return false;
 }
 };
-////

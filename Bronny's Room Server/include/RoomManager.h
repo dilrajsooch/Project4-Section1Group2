@@ -11,6 +11,7 @@ struct Post {
     int RoomId;
     int PostId;
     int UserId;
+    int Size;
 };
 
 struct User {
@@ -36,13 +37,14 @@ public:
 
 
     int addMessage(int roomId, int userId, std::string msg);
-    int addImage(int roomId, int userId, char* img);
+    int addImage(int roomId, int userId, char* img, int size);
     void addUser(int roomId, const User& user);
     int addRoom(std::string);
 
     std::string getPosts(int roomId);
     std::vector<User> getUsers(int roomId);
     std::string getRooms();
+    std::vector<Post> getImagePosts(int roomId);
 
     bool deletePost(int roomId, int messageId, int userId);
 

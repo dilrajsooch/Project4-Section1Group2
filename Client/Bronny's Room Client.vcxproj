@@ -129,6 +129,7 @@
     <ClInclude Include="ChatRoom.h" />
     <ClInclude Include="CSocket.h" />
     <ClInclude Include="CustomElements.h" />
+    <ClInclude Include="ImageCache.h" />
     <ClInclude Include="LoginPage.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="Page.h" />

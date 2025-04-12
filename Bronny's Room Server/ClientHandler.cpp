@@ -214,6 +214,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             int RoomId = pkt.Head.roomNumber;
             int UserId = pkt.Head.userId;
             int PostId = 0;
+            size_t fileSize;
 
             const char* text = pkt.GetText();
             if (text != nullptr && text[0] == '/') {
@@ -228,12 +229,27 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
 
                 // Read file contents into a vector.
                 file.seekg(0, std::ios::end);
-                size_t fileSize = file.tellg();
+                fileSize = file.tellg();
                 file.seekg(0, std::ios::beg);
                 std::vector<char> imageData(fileSize);
                 file.read(imageData.data(), fileSize);
                 file.close();
-                PostId = RoomManager::getInstance().addImage(RoomId, UserId, imageData.data());
+                PostId = RoomManager::getInstance().addImage(RoomId, UserId, imageData.data(), fileSize);
+
+                // Create return packet for image
+                Packet packet;
+                packet.SetType(Packet::ADD_POST);
+                packet.Head.userId = UserId;
+                packet.Head.roomNumber = RoomId;
+                packet.Head.isImage = true;
+                packet.Head.imageSize = fileSize;
+                packet.SetBody(imageData.data(), fileSize, true);
+
+                // Log return packet
+                Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, packet);
+
+                //Send return packet
+                send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
             }
             else {
                 PostId = RoomManager::getInstance().addMessage(RoomId, UserId, pkt.GetText());
@@ -256,7 +272,7 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             //Send return packet
             send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
             break;
-        } 
+        }
 
         case Packet::DELETE_POST:
         {
@@ -298,13 +314,14 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
             }
             //Get posts for room number
             int RoomId = pkt.Head.roomNumber;
+
+            // Get the posts as a string (without image data)
             std::string posts = RoomManager::getInstance().getPosts(RoomId);
 
-            // Create return packet
+            // Create return packet with post metadata
             Packet packet;
             packet.SetType(Packet::GET_POST);
             packet.Head.roomNumber = RoomId;
-
             packet.SetBody(posts.c_str(), posts.size());
 
             // Log return packet
@@ -312,8 +329,26 @@ void ClientHandler(SOCKET clientSocket, sockaddr_in clientAddr)
 
             //Send return packet
             send(clientSocket, packet.SerializeData(), packet.GetSize(), 0);
+
+            // Now send each image post separately
+            std::vector<Post> imagePosts = RoomManager::getInstance().getImagePosts(RoomId);
+            for (const auto& post : imagePosts) {
+                // Create a packet for each image
+                Packet imagePacket;
+                imagePacket.SetType(Packet::GET_POST);
+                imagePacket.Head.roomNumber = RoomId;
+                imagePacket.Head.isImage = true;
+                imagePacket.Head.imageSize = post.Size;
+                imagePacket.Head.userId = post.UserId;
+                imagePacket.SetBody(post.Data, post.Size, true);
+
+                // Log and send the image packet
+                Server::Logger::getInstance().LogPacket(OUTGOING_PACKET, clientIP, imagePacket);
+                send(clientSocket, imagePacket.SerializeData(), imagePacket.GetSize(), 0);
+            }
+
             break;
-        } 
+        }
 
         default:
             std::cout << "Unknown packet type from client.\n";

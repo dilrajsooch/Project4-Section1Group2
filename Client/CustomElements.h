@@ -1,6 +1,7 @@
 #pragma once
 #include "raygui.h"
 #include "raylib.h"
+#include "ImageCache.h"
 #include <string>
 
 
@@ -61,9 +62,9 @@ int GuiPost(Vector2 point, Post post, int* selectedDeletePost, bool* resetRooms)
     Image postImg = post.GetImage();
     if (postImg.width > 0 && postImg.height > 0)
     {
-        Texture2D postTexture = LoadTextureFromImage(postImg);
-        Rectangle imgDest = { point.x + padding, point.y + 40, 200, 150 };
-        DrawTextureRec(postTexture, { 0, 0, (float)postImg.width, (float)postImg.height }, { imgDest.x, imgDest.y }, WHITE);
+        Texture2D postTexture =  ImageCache::GetInstance()->GetTexture(post.GetID(), postImg);
+        Rectangle imgDest = { point.x + padding, point.y + 10, 128, 128 };
+        DrawTextureRec(postTexture, { 0, 0, 128, 128 }, { imgDest.x, imgDest.y }, WHITE);
     }
 
     Rectangle trashBounds = {
@@ -129,6 +130,9 @@ int GuiPost(Vector2 point, Post post, int* selectedDeletePost, bool* resetRooms)
             pkt.SetBody(postId.c_str(), strlen(postId.c_str()));
             pkt.SetType(Packet::DELETE_POST);
             CSocket::GetInstance()->SendPacket(pkt);
+
+            ImageCache::GetInstance()->RemoveTexture(post.GetID());
+
             *resetRooms = true;
         }
 

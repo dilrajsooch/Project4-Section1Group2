@@ -5,6 +5,7 @@
 #define NOMINMAX
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <vector>
 #include <string>
 #include "Packet.h"
 #pragma comment(lib, "Ws2_32.lib")
@@ -93,16 +94,37 @@ class CSocket
 
 		Packet RecievePacket()
 		{
-			char buffer[1024]; // Not sure what the size should be
-			if (recv(clientSocket, buffer, sizeof(buffer), 0) < 0)
-			{
-				cerr << "ERROR: Failed to recieve packet" << endl;
-				Packet failedPacket;
-				failedPacket.SetBody("-1", 2);
-				return failedPacket;
-
+			// First, read the header:
+			int bytesReceived = 0;
+			const int headerSize = sizeof(Packet::Header);
+			char headerBuffer[headerSize];
+			while (bytesReceived < headerSize) {
+				int res = recv(clientSocket, headerBuffer + bytesReceived, headerSize - bytesReceived, 0);
+				// Check for errors or connection closure
+				if (res <= 0) { /* handle error */ }
+				bytesReceived += res;
 			}
-			Packet newPacket(buffer);
+
+			// Now extract total size using the header fields (text and image sizes)
+			Packet::Header header;
+			memcpy(&header, headerBuffer, sizeof(Packet::Header));
+			int totalSize = sizeof(Packet::Header) + header.postTextSize + header.imageSize;
+
+			// Allocate a buffer for the rest of the packet:
+			std::vector<char> packetBuffer(totalSize);
+			// Copy the already-read header into packetBuffer.
+			memcpy(packetBuffer.data(), headerBuffer, sizeof(Packet::Header));
+
+			// Now, read the remaining data:
+			bytesReceived = sizeof(Packet::Header);
+			while (bytesReceived < totalSize) {
+				int res = recv(clientSocket, packetBuffer.data() + bytesReceived, totalSize - bytesReceived, 0);
+				if (res <= 0) { /* handle error */ }
+				bytesReceived += res;
+			}
+
+			// Now packetBuffer holds the full packet.
+			Packet newPacket(packetBuffer.data());
 			return newPacket;
 		}
 };
