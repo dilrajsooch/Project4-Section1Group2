@@ -142,5 +142,4 @@ int GuiPost(Vector2 point, Post post, int* selectedDeletePost, bool* resetRooms)
 }
 
 
-    return result;
-}
+
