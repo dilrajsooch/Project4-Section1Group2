@@ -14,7 +14,7 @@ private:
     Rectangle roomListPanelScrollView;
     Vector2 roomListPanelScrollOffset;
     float roomListPanelYOffset = 510;
-    float roomChatPanelYOffset = 510;
+    float roomChatPanelYOffset = 200;
     Rectangle roomChatPanelScrollView;
     Vector2 roomChatPanelScrollOffset;
     vector<ChatRoom> chatRooms;
@@ -205,9 +205,9 @@ public:
     {
         int postSpacing = 15;
 
-        if (roomChatPanelYOffset + selectedRoom.GetPostCount() * 100 > roomChatPanelYOffset)
+        if (selectedRoom.GetPostCount() * 165 > roomChatPanelYOffset)
         {
-            roomChatPanelYOffset = selectedRoom.GetPostCount() * (130);
+            roomChatPanelYOffset = selectedRoom.GetPostCount() * (165);
         }
 
         for (int i = 0; i < selectedRoom.GetPostCount(); i++)
@@ -243,6 +243,7 @@ public:
             {
                 selectedRoom = chatRoom;
                 selectedRoom.GetPosts();
+                roomChatPanelScrollOffset.y = 0;
             }
 
         }
