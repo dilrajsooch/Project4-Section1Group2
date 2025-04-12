@@ -47,9 +47,6 @@
     <ClInclude Include="CSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PacketHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Post.h">
       <Filter>Header Files</Filter>
     </ClInclude>

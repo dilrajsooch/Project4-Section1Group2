@@ -41,7 +41,7 @@ int GuiPost(Vector2 point, Post post, int* selectedDeletePost, bool* resetRooms)
 {
     int result = 0;
     int state = GuiGetState();
-    int fontSize = 10;
+    int fontSize = 20;
 
     const int padding = 10;
     const int iconSize = 2;
@@ -56,7 +56,7 @@ int GuiPost(Vector2 point, Post post, int* selectedDeletePost, bool* resetRooms)
     DrawRectangleLinesEx(postRect, 2, borderColor);
 
     std::string postText = post.GetText();
-    DrawText(postText.c_str(), (int)(point.x + padding), point.y, fontSize, BLACK);
+    DrawText(postText.c_str(), (int)(point.x + padding), point.y + 40, fontSize, BLACK);
 
     Image postImg = post.GetImage();
     if (postImg.width > 0 && postImg.height > 0)
@@ -68,7 +68,7 @@ int GuiPost(Vector2 point, Post post, int* selectedDeletePost, bool* resetRooms)
 
     Rectangle trashBounds = {
         point.x + postWidth - padding - iconSize * 10,
-        point.y + padding,
+        point.y + padding + 20,
         (float)iconSize * 12,
         (float)iconSize * 14
     };

@@ -12,19 +12,19 @@
 
 using namespace std;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) 
+{
     InitWindow(800, 450, "Bronny's Room");
     SetTargetFPS(60);
 
     string ip = "";
-
-    cout << argc << endl;
     
     if (argc >= 2)
     {
         ip = argv[1];
     }
 
+    
     // Create Socket
     CSocket* cSocket = CSocket::GetInstance();
 

@@ -93,7 +93,7 @@ public:
             &roomChatPanelScrollOffset, 
             &roomChatPanelScrollView);
         DrawPosts();
-        GuiLabel({ 370, 35, 120, 24 }, selectedRoom.GetName().c_str());
+        DrawText(selectedRoom.GetName().c_str(), 370, 35, 32, BLACK);
         if (GuiTextBox({ 100,400,600, 50 }, postText, 256, postTextEditMode))
         {
             postTextEditMode = !postTextEditMode;
