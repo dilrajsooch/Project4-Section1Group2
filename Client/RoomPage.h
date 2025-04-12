@@ -183,22 +183,37 @@ public:
             }
         }
 
-        if (GuiButton({ 700, 400, 100,50 }, "<<"))
-        {
-            if (strcmp(postText, "") == 0 || strcmp(selectedRoom.GetName().c_str(), "Empty") == 0) return;
+    if (GuiButton({ 700, 400, 100,50 }, "<<"))
+    {
+        if (strcmp(postText, "") == 0 || strcmp(selectedRoom.GetName().c_str(), "Empty") == 0) return;
 
-            Packet pkt;
-            pkt.SetRoomNumber(selectedRoom.GetRoomNumber());
-            pkt.SetBody(postText, strlen(postText));
-            pkt.SetType(Packet::ADD_POST);
-            pkt.Head.userId = User::MainUser.GetId();
+        Packet pkt;
+        pkt.SetRoomNumber(selectedRoom.GetRoomNumber());
+        pkt.SetUserId(User::MainUser.GetId());
+        pkt.SetType(Packet::ADD_POST);
 
-            CSocket::GetInstance()->SendPacket(pkt);
+        if (postText[0] == '/') {
+            // special trigger, tell server to send image
+            pkt.SetBody(postText, strlen(postText), false); // text trigger
+        } else {
+            pkt.SetBody(postText, strlen(postText), false); // normal post
+        }
 
-            memset(postText, 0, sizeof(postText));
+        Packet result = CSocket::GetInstance()->SendPacket(pkt);
+
+        // If the server sent an image right away
+        if (result.Head.isImage) {
+            Image img = LoadImageFromMemory(".jpg", (unsigned char*)result.GetImage(), result.Head.imageSize);
+            Post imgPost(selectedRoom.GetRoomNumber(), img, result.Head.userId, 0);
+            selectedRoom.AddPost(imgPost);
+        } else {
             selectedRoom.GetPosts();
         }
+
+        memset(postText, 0, sizeof(postText));
     }
+
+    
 
     void DrawPosts()
     {
