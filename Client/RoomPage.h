@@ -14,6 +14,7 @@ private:
     Rectangle roomListPanelScrollView;
     Vector2 roomListPanelScrollOffset;
     float roomListPanelYOffset = 510;
+    float roomChatPanelYOffset = 510;
     Rectangle roomChatPanelScrollView;
     Vector2 roomChatPanelScrollOffset;
     vector<ChatRoom> chatRooms;
@@ -89,7 +90,7 @@ public:
         DrawRoomButtons();
         GuiScrollPanel({ 100, 100, 700, 460}, 
             "ChatRoom", 
-            {0, 0, 700, 672}, 
+            {0, 0, 700, roomChatPanelYOffset},
             &roomChatPanelScrollOffset, 
             &roomChatPanelScrollView);
         DrawPosts();
@@ -203,6 +204,12 @@ public:
     void DrawPosts()
     {
         int postSpacing = 15;
+
+        if (roomChatPanelYOffset + selectedRoom.GetPostCount() * 100 > roomChatPanelYOffset)
+        {
+            roomChatPanelYOffset = selectedRoom.GetPostCount() * (130);
+        }
+
         for (int i = 0; i < selectedRoom.GetPostCount(); i++)
         {
             Post post = selectedRoom.GetPostByIndex(i);

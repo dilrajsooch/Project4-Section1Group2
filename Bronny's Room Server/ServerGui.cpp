@@ -5,6 +5,10 @@
 void ServerGUI::Init(int screenWidth, int screenHeight) {
     InitWindow(screenWidth, screenHeight, "Bronney's Server");
     SetTargetFPS(60);
+    // Load a basketball icon
+    Image icon = LoadImage("resources/basketball_icon.png");
+    SetWindowIcon(icon);
+    UnloadImage(icon);
 }
 
 void ServerGUI::RunLoop() {
@@ -28,7 +32,7 @@ void ServerGUI::DrawServerInfo(const ServerState& state, const int& count, const
     //Header
     std::string stateStr = ServerStateToString(state);
     std::string info = "State: " + stateStr + " | Connected Users: " + std::to_string(count);
-    DrawText(info.c_str(), 10, 10, 20, BLACK);
+    DrawText(info.c_str(), 10, 10, 20, ORANGE);
 
     const int logPanelY = 40;
 
@@ -52,14 +56,15 @@ void ServerGUI::DrawServerInfo(const ServerState& state, const int& count, const
         logScrollOffset = 0;
     }
 
-    DrawRectangle(0, logPanelY, GetScreenWidth(), GetScreenHeight() - logPanelY, RAYWHITE);
+    // Draw background with basketball theme color
+    DrawRectangle(0, logPanelY, GetScreenWidth(), GetScreenHeight() - logPanelY, ORANGE);
 
     //Draw logs using the scroll offset
     int y = logPanelY - logScrollOffset;
     for (const auto& log : logs) {
         //Only draw if is visible
         if (y >= logPanelY && y < GetScreenHeight() - 20) {
-            DrawText(log.c_str(), 10, y, 16, DARKGRAY);
+            DrawText(log.c_str(), 10, y, 16, BLACK);
         }
         y += 20;
     }
@@ -70,7 +75,7 @@ void ServerGUI::DrawServerInfo(const ServerState& state, const int& count, const
         int scrollBarHeight = visibleArea * visibleArea / totalLogHeight;
         //Calculate the scrollbar position relative to the scroll offset
         int scrollBarY = logPanelY + (logScrollOffset * visibleArea / totalLogHeight);
-        DrawRectangle(GetScreenWidth() - 15, scrollBarY, 10, scrollBarHeight, GRAY);
+        DrawRectangle(GetScreenWidth() - 15, scrollBarY, 10, scrollBarHeight, BLACK);
     }
 }
 
